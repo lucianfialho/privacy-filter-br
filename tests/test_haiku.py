@@ -4,27 +4,20 @@ from src.haiku import HaikuGenerator, CLUE_POSITIONS
 
 
 def test_haiku_generator_returns_text():
-    mock_proc = Mock()
-    mock_proc.returncode = 0
-    mock_proc.stdout = "João Silva tem CPF 123.456.789-09 e mora em São Paulo"
-    mock_proc.stderr = ""
-    with patch("src.haiku.subprocess.run", return_value=mock_proc):
+    sse_lines = [
+        'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"João Silva"}}',
+        'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":" tem CPF 123.456.789-09"}}',
+        'data: {"type":"message_stop"}',
+    ]
+    mock_resp = Mock()
+    mock_resp.iter_lines.return_value = iter(sse_lines)
+    mock_resp.raise_for_status = Mock()
+    with patch("src.haiku.requests.post", return_value=mock_resp):
         gen = HaikuGenerator()
         result = gen.generate("email", {"nome": "João Silva", "cpf_valor": "123.456.789-09",
                                          "email": "joao@email.com", "cidade": "São Paulo", "estado": "SP"})
     assert "João Silva" in result
     assert "123.456.789-09" in result
-
-
-def test_haiku_generator_raises_on_nonzero_exit():
-    mock_proc = Mock()
-    mock_proc.returncode = 1
-    mock_proc.stderr = "auth error"
-    with patch("src.haiku.subprocess.run", return_value=mock_proc):
-        gen = HaikuGenerator()
-        with pytest.raises(RuntimeError, match="claude CLI failed"):
-            gen.generate("email", {"nome": "test", "cpf_valor": "123", "email": "a@b.com",
-                                    "cidade": "SP", "estado": "SP"})
 
 
 def test_clue_positions_has_three_options():
