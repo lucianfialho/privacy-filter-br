@@ -1,0 +1,25 @@
+NOTA FISCAL ELETRÔNICA — Nº {{ numero_nf | default("000456789") }}
+Data emissão: {{ data_emissao | default("15/10/2026") }}
+Chave de acesso: {{ chave_nfe | default("35261234567890123456550010000001231234567890") }}
+
+EMITENTE
+Razão Social: {{ nome_empresa | default("Tecnologia e Serviços Ltda") }}
+CNPJ: {{ cnpj_valor }}
+Inscrição Estadual: {{ ie_valor }}
+Endereço: {{ endereco_empresa | default("Av Empresarial, 500") }}, {{ cidade }}/{{ estado }}
+
+TOMADOR
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+Endereço: {{ endereco }}, {{ cidade }}/{{ estado }} — CEP: {{ cep_valor }}
+E-mail: {{ email }}
+Telefone: {{ celular_valor }}
+
+PRODUTOS/SERVIÇOS
+1. {{ descricao_produto | default("Consultoria técnica") }} — R$ {{ valor_unitario | default("2.500,00") }}
+2. {{ descricao_produto2 | default("Licença de software anual") }} — R$ {{ valor_unitario2 | default("1.800,00") }}
+
+TOTAIS
+Base ICMS: R$ {{ base_icms | default("4.300,00") }}
+Valor ICMS: R$ {{ valor_icms | default("774,00") }}
+Valor Total NF: R$ {{ valor_total | default("4.300,00") }}

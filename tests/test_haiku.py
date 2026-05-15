@@ -4,18 +4,18 @@ from src.haiku import HaikuGenerator, CLUE_POSITIONS
 
 
 def test_haiku_generator_returns_text():
-    sse_lines = [
-        'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"João Silva"}}',
-        'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":" tem CPF 123.456.789-09"}}',
-        'data: {"type":"message_stop"}',
-    ]
-    mock_resp = Mock()
-    mock_resp.iter_lines.return_value = iter(sse_lines)
-    mock_resp.raise_for_status = Mock()
-    with patch("src.haiku.requests.post", return_value=mock_resp):
+    # Mock Anthropic SDK response
+    mock_block = Mock()
+    mock_block.text = "João Silva tem CPF 123.456.789-09"
+    mock_message = Mock()
+    mock_message.content = [mock_block]
+    with patch("src.haiku.Anthropic") as MockAnthropic:
+        MockAnthropic.return_value.messages.create.return_value = mock_message
         gen = HaikuGenerator()
-        result = gen.generate("email", {"nome": "João Silva", "cpf_valor": "123.456.789-09",
-                                         "email": "joao@email.com", "cidade": "São Paulo", "estado": "SP"})
+        result = gen.generate("email", {
+            "nome": "João Silva", "cpf_valor": "123.456.789-09",
+            "email": "joao@email.com", "cidade": "São Paulo", "estado": "SP"
+        })
     assert "João Silva" in result
     assert "123.456.789-09" in result
 

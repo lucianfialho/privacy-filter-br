@@ -1,0 +1,25 @@
+EXTRATO BANCÁRIO — Período {{ periodo | default("01/10/2026 a 31/10/2026") }}
+
+CORRENTISTA
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+Agência: {{ agencia | default("0001-9") }}
+Conta corrente: {{ conta | default("12.345-6") }}
+E-mail cadastrado: {{ email }}
+Telefone: {{ celular_valor }}
+
+ENDEREÇO CADASTRAL
+{{ endereco }}, {{ cidade }}/{{ estado }} — CEP {{ cep_valor }}
+
+LANÇAMENTOS
+
+{{ data1 | default("03/10/2026") }} | PIX RECEBIDO de {{ nome_remetente | default("João da Silva") }} | R$ {{ valor1 | default("1.500,00") }} | Crédito
+{{ data2 | default("07/10/2026") }} | TED PARA {{ nome_empresa | default("Fornecedor Ltda") }} CNPJ {{ cnpj_valor }} | R$ {{ valor2 | default("3.200,00") }} | Débito
+{{ data3 | default("12/10/2026") }} | BOLETO {{ codigo_boleto | default("23793.38128 60012") }} | R$ {{ valor3 | default("450,00") }} | Débito
+{{ data4 | default("18/10/2026") }} | SALÁRIO | R$ {{ valor4 | default("8.500,00") }} | Crédito
+{{ data5 | default("22/10/2026") }} | TARIFA MANUTENÇÃO | R$ 26,90 | Débito
+
+SALDO ANTERIOR: R$ {{ saldo_anterior | default("2.300,00") }}
+SALDO ATUAL: R$ {{ saldo_atual | default("8.623,10") }}
+
+Em caso de dúvida: {{ telefone_fixo_valor | default("(11) 3000-3000") }}

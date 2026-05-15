@@ -1,0 +1,32 @@
+FATURA DE PRESTAÇÃO DE SERVIÇO
+
+Nº da fatura: {{ numero_fatura | default("FAT-2026-001234") }}
+Data de emissão: {{ data_emissao | default("01/10/2026") }}
+Data de vencimento: {{ data_vcto | default("31/10/2026") }}
+
+PRESTADOR DO SERVIÇO
+Razão Social: {{ nome_empresa | default("Consultoria Empresarial Ltda") }}
+CNPJ: {{ cnpj_valor }}
+Inscrição Municipal: {{ inscricao_municipal | default("12.345.678") }}
+Inscrição Estadual: {{ ie_valor }}
+Endereço: {{ endereco_empresa | default("Av Empresarial, 2000") }}, {{ cidade }}/{{ estado }}
+
+TOMADOR DOS SERVIÇOS
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+Endereço: {{ endereco }}, {{ cidade }}/{{ estado }} — CEP {{ cep_valor }}
+E-mail: {{ email }}
+Telefone: {{ celular_valor }}
+
+DESCRIÇÃO DOS SERVIÇOS
+{{ descricao | default("Consultoria estratégica em marketing digital — Outubro 2026") }}
+
+VALORES
+Valor dos serviços: R$ {{ valor_servico | default("5.000,00") }}
+Retenção INSS (11%): R$ {{ retencao_inss | default("550,00") }}
+Retenção IRRF: R$ {{ retencao_irrf | default("75,00") }}
+Valor Líquido: R$ {{ valor_liquido | default("4.375,00") }}
+
+INSTRUÇÕES DE PAGAMENTO
+PIX: {{ cnpj_valor }} (chave CNPJ)
+Banco: {{ banco | default("Itaú") }}, Agência: {{ agencia | default("0123") }}, Conta: {{ conta | default("12345-6") }}

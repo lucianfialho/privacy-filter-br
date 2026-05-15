@@ -1,0 +1,28 @@
+DARF — DOCUMENTO DE ARRECADAÇÃO DE RECEITAS FEDERAIS
+
+Período de Apuração: {{ periodo | default("09/2026") }}
+Número do documento: {{ numero_doc | default("0000000000003456789") }}
+Data de Vencimento: {{ data_vcto | default("20/10/2026") }}
+
+CONTRIBUINTE
+Razão Social: {{ nome_empresa | default("Empresa Contribuinte Ltda") }}
+CNPJ: {{ cnpj_valor }}
+Endereço: {{ endereco }}, {{ cidade }}/{{ estado }}, CEP {{ cep_valor }}
+
+RESPONSÁVEL
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+E-mail: {{ email }}
+Telefone: {{ celular_valor }}
+
+DETALHES
+Código da Receita: {{ codigo_receita | default("0220") }} — {{ descricao_receita | default("IRPJ — Pessoa Jurídica") }}
+Referência: {{ referencia | default("Tributação trimestre 3/2026") }}
+
+VALORES
+Valor Principal: R$ {{ valor_principal | default("12.350,00") }}
+Multa (se houver): R$ {{ multa | default("0,00") }}
+Juros: R$ {{ juros | default("0,00") }}
+Total a Recolher: R$ {{ valor_total | default("12.350,00") }}
+
+Autenticação bancária: {{ autenticacao | default("0010202610200000000001235000") }}

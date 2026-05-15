@@ -6,8 +6,14 @@ from src.labeler import label_text
 from src.validator import validate_example, ValidationResult
 from src.haiku import HaikuGenerator
 
-TEMPLATES = ["email", "nfe", "contrato", "holerite",
-             "certidao", "cadastro", "comunicado", "relatorio"]
+TEMPLATES = [
+    # Originais
+    "email", "nfe", "contrato", "holerite",
+    "certidao", "cadastro", "comunicado", "relatorio",
+    # B2B novos
+    "nfe_completa", "darf", "boleto",
+    "comprovante_pix", "extrato_bancario", "fatura_servico",
+]
 
 
 @dataclass

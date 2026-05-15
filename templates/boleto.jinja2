@@ -1,0 +1,27 @@
+BOLETO BANCÁRIO
+
+Banco: {{ banco | default("Itaú") }} ({{ codigo_banco | default("341") }})
+Linha digitável: {{ linha_digitavel | default("34191.79001 01043.510047 91020.150008 7 88030000012500") }}
+Nosso número: {{ nosso_numero | default("17900-8") }}
+Vencimento: {{ data_vcto | default("25/10/2026") }}
+
+BENEFICIÁRIO
+Nome: {{ nome_empresa | default("Empresa Cobradora Ltda") }}
+CNPJ: {{ cnpj_valor }}
+Endereço: {{ endereco_empresa | default("Av Brasil, 1000") }}, {{ cidade }}/{{ estado }}
+
+PAGADOR
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+Endereço: {{ endereco }}, {{ cidade }}/{{ estado }} — CEP: {{ cep_valor }}
+E-mail: {{ email }}
+Telefone: {{ celular_valor }}
+
+DETALHES DA COBRANÇA
+Descrição: {{ descricao | default("Mensalidade serviço — referência 09/2026") }}
+Valor do Documento: R$ {{ valor | default("1.250,00") }}
+Mora/Juros (após vencimento): {{ mora | default("0,033% ao dia") }}
+
+INSTRUÇÕES
+Não receber após {{ data_limite | default("25/11/2026") }}
+Em caso de dúvida, contato: {{ telefone_fixo_valor | default("(11) 3000-0000") }}

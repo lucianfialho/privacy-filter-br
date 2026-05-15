@@ -1,0 +1,25 @@
+COMPROVANTE DE TRANSFERÊNCIA PIX
+
+Data/Hora: {{ data_hora | default("15/10/2026 14:32:18") }}
+ID da Transação: {{ id_transacao | default("E12345678202610151432181234567890") }}
+Status: CONCLUÍDA
+
+PAGADOR
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+Instituição: {{ banco_pagador | default("Banco do Brasil") }}
+Agência: {{ agencia | default("1234-5") }}
+Conta: {{ conta | default("12345-6") }}
+
+RECEBEDOR
+Nome: {{ nome_recebedor | default("Empresa Beneficiária Ltda") }}
+CNPJ: {{ cnpj_valor }}
+Chave PIX (CNPJ): {{ cnpj_valor }}
+Instituição: {{ banco_recebedor | default("Itaú") }}
+
+VALOR
+Valor da operação: R$ {{ valor | default("2.500,00") }}
+Descrição: {{ descricao | default("Pagamento NF 000456 — out/2026") }}
+
+E-mail para comprovante: {{ email }}
+Telefone de contato: {{ celular_valor }}
