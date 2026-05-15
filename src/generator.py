@@ -1,10 +1,15 @@
+import os
 import random
+import sys
 from dataclasses import dataclass, field
 from src.pessoa import gerar_perfil_completo
 from src.variants import get_variants_for_perfil, pick_variant
 from src.labeler import label_text
 from src.validator import validate_example, ValidationResult
 from src.haiku import HaikuGenerator
+
+# Set DEBUG=1 in env to see error messages
+_DEBUG = bool(os.getenv("DEBUG"))
 
 TEMPLATES = [
     # Originais
@@ -43,7 +48,9 @@ def generate_example(haiku: HaikuGenerator | None = None) -> dict | None:
 
     try:
         perfil = gerar_perfil_completo()
-    except Exception:
+    except Exception as e:
+        if _DEBUG:
+            print(f"[generator] perfil error: {e}", file=sys.stderr)
         return None
     variants = get_variants_for_perfil(perfil)
 
@@ -73,7 +80,9 @@ def generate_example(haiku: HaikuGenerator | None = None) -> dict | None:
     template_name = random.choice(TEMPLATES)
     try:
         text = haiku.generate(template_name, chosen)
-    except Exception:
+    except Exception as e:
+        if _DEBUG:
+            print(f"[generator] haiku error ({template_name}): {type(e).__name__}: {e}", file=sys.stderr)
         return None
 
     example = label_text(text, inserted)
