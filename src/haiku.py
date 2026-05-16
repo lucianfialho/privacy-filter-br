@@ -1,5 +1,5 @@
 import os
-from anthropic import Anthropic
+import subprocess
 from jinja2 import Environment, FileSystemLoader
 
 CLUE_POSITIONS = {
@@ -52,16 +52,12 @@ _TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "..", "templates")
 
 
 class HaikuGenerator:
+    """Wraps `claude --print` subprocess. Uses Claude subscription, no API tokens needed.
+
+    Run `claude auth login` once before using.
+    """
+
     def __init__(self, **kwargs):
-        # Uses official Anthropic SDK. Reads ANTHROPIC_API_KEY (or ANTHROPIC_AUTH_TOKEN).
-        # ANTHROPIC_BASE_URL still works for proxies.
-        api_key = os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN", "")
-        base_url = os.getenv("ANTHROPIC_BASE_URL")
-        client_kwargs = {"api_key": api_key}
-        if base_url:
-            client_kwargs["base_url"] = base_url
-        self.client = Anthropic(**client_kwargs)
-        self.model = os.getenv("HAIKU_MODEL", "claude-haiku-4-5")
         self.env = Environment(loader=FileSystemLoader(_TEMPLATES_DIR))
 
     def generate(self, template_name: str, context: dict) -> str:
@@ -72,9 +68,13 @@ class HaikuGenerator:
             f"mantendo TODOS os valores exatamente como estão (CPF, CNPJ, nomes, etc). "
             f"NÃO altere nenhum número ou dado pessoal:\n\n{rendered}"
         )
-        msg = self.client.messages.create(
-            model=self.model,
-            max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}],
+        result = subprocess.run(
+            ["claude", "--print"],
+            input=prompt,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
-        return msg.content[0].text
+        if result.returncode != 0:
+            raise RuntimeError(f"claude CLI failed: {result.stderr[:200]}")
+        return result.stdout.strip()

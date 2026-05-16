@@ -4,13 +4,11 @@ from src.haiku import HaikuGenerator, CLUE_POSITIONS
 
 
 def test_haiku_generator_returns_text():
-    # Mock Anthropic SDK response
-    mock_block = Mock()
-    mock_block.text = "João Silva tem CPF 123.456.789-09"
-    mock_message = Mock()
-    mock_message.content = [mock_block]
-    with patch("src.haiku.Anthropic") as MockAnthropic:
-        MockAnthropic.return_value.messages.create.return_value = mock_message
+    mock_result = Mock()
+    mock_result.returncode = 0
+    mock_result.stdout = "João Silva tem CPF 123.456.789-09 e mora em São Paulo"
+    mock_result.stderr = ""
+    with patch("src.haiku.subprocess.run", return_value=mock_result):
         gen = HaikuGenerator()
         result = gen.generate("email", {
             "nome": "João Silva", "cpf_valor": "123.456.789-09",
@@ -18,6 +16,18 @@ def test_haiku_generator_returns_text():
         })
     assert "João Silva" in result
     assert "123.456.789-09" in result
+
+
+def test_haiku_generator_raises_on_nonzero_exit():
+    mock_result = Mock()
+    mock_result.returncode = 1
+    mock_result.stderr = "auth error"
+    mock_result.stdout = ""
+    with patch("src.haiku.subprocess.run", return_value=mock_result):
+        gen = HaikuGenerator()
+        with pytest.raises(RuntimeError, match="claude CLI failed"):
+            gen.generate("email", {"nome": "test", "cpf_valor": "123",
+                                    "email": "a@b.com", "cidade": "SP", "estado": "SP"})
 
 
 def test_clue_positions_has_three_options():
