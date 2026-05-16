@@ -52,7 +52,12 @@ def main():
                         help="Parallel workers (1=serial, 10-20 recommended for Anthropic API)")
     parser.add_argument("--batch-submit", type=int, default=200,
                         help="How many tasks to submit to the pool at once")
+    parser.add_argument("--provider", choices=["claude", "minimax"], default=None,
+                        help="LLM provider (default: claude or $PROVIDER env)")
     args = parser.parse_args()
+
+    if args.provider:
+        os.environ["PROVIDER"] = args.provider
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     holdout_path = args.output.replace(".jsonl", "_holdout.jsonl")

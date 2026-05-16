@@ -1,5 +1,6 @@
 import os
 import subprocess
+import requests
 from jinja2 import Environment, FileSystemLoader
 
 CLUE_POSITIONS = {
@@ -50,24 +51,43 @@ CLUE_POSITIONS = {
 
 _TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "..", "templates")
 
+PROMPT_PREFIX = (
+    "Reescreva o texto abaixo em português BR natural e formal, "
+    "mantendo TODOS os valores exatamente como estão (CPF, CNPJ, nomes, etc). "
+    "NÃO altere nenhum número ou dado pessoal:\n\n"
+)
+
 
 class HaikuGenerator:
-    """Wraps `claude --print` subprocess. Uses Claude subscription, no API tokens needed.
+    """Provider-aware generator. Two backends:
 
-    Run `claude auth login` once before using.
+    - provider='claude' (default): subprocess `claude --print`, uses subscription
+    - provider='minimax': HTTP API to MiniMax chat completions, uses MINIMAX_API_KEY
+
+    Provider can also be set via env: PROVIDER=claude|minimax
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, provider: str | None = None, **kwargs):
+        self.provider = (provider or os.getenv("PROVIDER", "claude")).lower()
         self.env = Environment(loader=FileSystemLoader(_TEMPLATES_DIR))
+        if self.provider == "minimax":
+            self.minimax_key = os.getenv("MINIMAX_API_KEY", "")
+            self.minimax_url = os.getenv(
+                "MINIMAX_URL",
+                "https://api.minimax.io/v1/text/chatcompletion_v2",
+            )
+            self.minimax_model = os.getenv("MINIMAX_MODEL", "MiniMax-Text-01")
 
     def generate(self, template_name: str, context: dict) -> str:
         tpl = self.env.get_template(f"{template_name}.jinja2")
         rendered = tpl.render(**context)
-        prompt = (
-            f"Reescreva o texto abaixo em português BR natural e formal, "
-            f"mantendo TODOS os valores exatamente como estão (CPF, CNPJ, nomes, etc). "
-            f"NÃO altere nenhum número ou dado pessoal:\n\n{rendered}"
-        )
+        prompt = PROMPT_PREFIX + rendered
+
+        if self.provider == "minimax":
+            return self._generate_minimax(prompt)
+        return self._generate_claude(prompt)
+
+    def _generate_claude(self, prompt: str) -> str:
         result = subprocess.run(
             ["claude", "--print"],
             input=prompt,
@@ -78,3 +98,22 @@ class HaikuGenerator:
         if result.returncode != 0:
             raise RuntimeError(f"claude CLI failed: {result.stderr[:200]}")
         return result.stdout.strip()
+
+    def _generate_minimax(self, prompt: str) -> str:
+        resp = requests.post(
+            self.minimax_url,
+            headers={
+                "Authorization": f"Bearer {self.minimax_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": self.minimax_model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 1024,
+                "temperature": 0.7,
+            },
+            timeout=60,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["choices"][0]["message"]["content"].strip()
