@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import requests
 from jinja2 import Environment, FileSystemLoader
@@ -83,7 +84,8 @@ class HaikuGenerator:
                 "MINIMAX_URL",
                 "https://api.minimax.io/v1/text/chatcompletion_v2",
             )
-            self.minimax_model = os.getenv("MINIMAX_MODEL", "MiniMax-Text-01")
+            # M2.7 default (reasoning model — emits <think> blocks before answer)
+            self.minimax_model = os.getenv("MINIMAX_MODEL", "MiniMax-M2.7")
 
     def generate(self, template_name: str, context: dict) -> str:
         tpl = self.env.get_template(f"{template_name}.jinja2")
@@ -116,10 +118,12 @@ class HaikuGenerator:
             json={
                 "model": self.minimax_model,
                 "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": 1024,
+                # M2.7 is a reasoning model — emits <think> blocks before final text
+                # Give enough budget for both
+                "max_tokens": 4096,
                 "temperature": 0.7,
             },
-            timeout=60,
+            timeout=120,
         )
         data = resp.json()
 
@@ -143,4 +147,7 @@ class HaikuGenerator:
                 f"MiniMax content empty (finish_reason={finish}). Full: {data}"
             )
 
-        return content.strip() if isinstance(content, str) else str(content).strip()
+        text = content if isinstance(content, str) else str(content)
+        # Strip reasoning model think blocks
+        text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+        return text.strip()
