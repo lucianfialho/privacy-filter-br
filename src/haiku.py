@@ -97,15 +97,21 @@ class HaikuGenerator:
         return self._generate_claude(prompt)
 
     def _generate_claude(self, prompt: str) -> str:
+        # Strip ANTHROPIC_API_KEY from subprocess env — claude CLI prefers subscription
+        # when no API key is set. The .env file is loaded for MINIMAX_API_KEY but
+        # ANTHROPIC_API_KEY might be a placeholder ("your_key_here") that breaks claude.
+        env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
         result = subprocess.run(
             ["claude", "--print"],
             input=prompt,
             capture_output=True,
             text=True,
             timeout=120,
+            env=env,
         )
         if result.returncode != 0:
-            raise RuntimeError(f"claude CLI failed: {result.stderr[:200]}")
+            err = (result.stderr or result.stdout or "(no output)")[:200]
+            raise RuntimeError(f"claude CLI failed: {err}")
         return result.stdout.strip()
 
     def _generate_minimax(self, prompt: str) -> str:
