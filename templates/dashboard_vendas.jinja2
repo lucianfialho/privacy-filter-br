@@ -1,0 +1,24 @@
+RELATÓRIO DE VENDAS — {{ periodo | default("Outubro 2026") }}
+Cliente: {{ nome_empresa | default("Empresa Cliente Ltda") }} — CNPJ {{ cnpj_valor }}
+Responsável: {{ nome }} | {{ email }} | {{ celular_valor }}
+
+RESUMO FINANCEIRO
+Receita bruta no período: {{ revenue_valor }}
+Pedidos processados: {{ qtd_pedidos | default("1.247") }}
+Ticket médio: R$ {{ ticket_medio | default("385,42") }}
+Margem operacional: {{ margem | default("18,5%") }}
+
+TOP PEDIDOS DO PERÍODO
+1. Pedido {{ order_id_valor }} — {{ revenue_valor }}
+2. Pedido {{ order_id_alt | default("ML-2026-78451206") }} — R$ {{ valor2 | default("12.450,00") }}
+3. Pedido {{ order_id_alt2 | default("MGL987654321098") }} — R$ {{ valor3 | default("8.730,00") }}
+
+TRANSAÇÕES FINANCEIRAS
+PIX recebido: {{ transaction_id_valor }} — Fatura {{ invoice_number_valor }}
+
+DADOS DO CLIENTE PRINCIPAL
+ID interno: {{ customer_id_valor }}
+Inscrição Estadual: {{ ie_valor }}
+Endereço fiscal: {{ endereco }}, {{ cidade }}/{{ estado }}, CEP {{ cep_valor }}
+
+CONFIDENCIAL — Dados sujeitos a NDA. Não distribuir.

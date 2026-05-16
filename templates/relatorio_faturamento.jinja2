@@ -1,0 +1,29 @@
+RELATÓRIO MENSAL DE FATURAMENTO
+
+Cliente analisado: {{ nome_empresa | default("Cliente Confidencial") }}
+CNPJ: {{ cnpj_valor }}
+Inscrição Estadual: {{ ie_valor }}
+Responsável pela análise: {{ nome }} ({{ email }})
+
+PERÍODO: {{ periodo | default("Setembro 2026") }}
+
+INDICADORES PRINCIPAIS
+Receita bruta total: {{ revenue_valor }}
+Número de transações: {{ qtd_tx | default("3.247") }}
+Cliente principal (ID): {{ customer_id_valor }}
+Fatura de referência: {{ invoice_number_valor }}
+
+MAIORES PEDIDOS
+- Pedido {{ order_id_valor }} — {{ revenue_valor }}
+- Transação destacada: {{ transaction_id_valor }}
+
+INFORMAÇÕES OPERACIONAIS
+Código de envio principal: {{ tracking_code_valor }}
+Endereço fiscal: {{ endereco }}, {{ cidade }}/{{ estado }}, CEP {{ cep_valor }}
+Contato comercial: {{ celular_valor }}
+
+OBSERVAÇÕES CONFIDENCIAIS
+Margem do período sob NDA. Não compartilhar dados de faturamento
+externamente sem autorização do cliente.
+
+Documento gerado em {{ data_relatorio | default("01/10/2026") }} por {{ nome }}.

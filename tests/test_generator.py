@@ -12,7 +12,14 @@ MOCK_PERFIL = {
     "celular": "(11) 99999-9999", "telefone_fixo": "(11) 3333-3333",
     "cep": "01310-100",
     "endereco": "Av Paulista, 1000, Bela Vista",
-    "cidade": "São Paulo", "estado": "SP", "data_nasc": "01/01/1990"
+    "cidade": "São Paulo", "estado": "SP", "data_nasc": "01/01/1990",
+    # e-commerce / B2B identifiers
+    "order_id": "ML-2026-12345678",
+    "tracking_code": "BR123456789BR",
+    "invoice_number": "NF-2026-000456",
+    "revenue": "R$ 1.234.567,89",
+    "transaction_id": "E1234567820261015143218",
+    "customer_id": "CUST-ABC12345",
 }
 
 

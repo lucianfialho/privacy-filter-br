@@ -1,0 +1,27 @@
+COMPROVANTE DE ENTREGA
+
+Pedido: {{ order_id_valor }}
+Rastreio: {{ tracking_code_valor }}
+Data/hora da entrega: {{ data_entrega | default("20/10/2026 14:32") }}
+
+DESTINATÁRIO
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+Telefone para contato: {{ celular_valor }}
+E-mail: {{ email }}
+Endereço completo: {{ endereco }}, {{ cidade }}/{{ estado }}, CEP {{ cep_valor }}
+
+REMETENTE
+Razão Social: {{ nome_empresa | default("E-commerce Ltda") }}
+CNPJ: {{ cnpj_valor }}
+Fatura: {{ invoice_number_valor }}
+
+ITEM(NS) ENTREGUE(S)
+1. {{ produto1 | default("Smartphone modelo X") }} — R$ {{ valor1 | default("2.499,00") }}
+2. {{ produto2 | default("Capa protetora") }} — R$ {{ valor2 | default("89,90") }}
+
+Valor total da operação: {{ revenue_valor }}
+Transação de pagamento: {{ transaction_id_valor }}
+
+Recebido por: ___________________
+Assinatura conferida.

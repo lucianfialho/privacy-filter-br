@@ -15,9 +15,12 @@ TEMPLATES = [
     # Originais
     "email", "nfe", "contrato", "holerite",
     "certidao", "cadastro", "comunicado", "relatorio",
-    # B2B novos
+    # B2B / fiscal
     "nfe_completa", "darf", "boleto",
     "comprovante_pix", "extrato_bancario", "fatura_servico",
+    # E-commerce / faturamento
+    "pedido_marketplace", "dashboard_vendas",
+    "comprovante_delivery", "relatorio_faturamento",
 ]
 
 

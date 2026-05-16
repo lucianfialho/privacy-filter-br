@@ -1,0 +1,28 @@
+PEDIDO {{ marketplace | default("MERCADO LIVRE") }}
+
+Número do pedido: {{ order_id_valor }}
+Status: {{ status | default("Despachado") }}
+Data: {{ data_pedido | default("18/10/2026") }}
+
+COMPRADOR
+Nome: {{ nome }}
+CPF: {{ cpf_valor }}
+E-mail: {{ email }}
+Telefone: {{ celular_valor }}
+ID Cliente: {{ customer_id_valor }}
+
+VENDEDOR
+Razão Social: {{ nome_empresa | default("Loja Exemplo Ltda") }}
+CNPJ: {{ cnpj_valor }}
+Inscrição Estadual: {{ ie_valor }}
+
+ENTREGA
+Endereço: {{ endereco }}, {{ cidade }}/{{ estado }}
+CEP: {{ cep_valor }}
+Código de rastreio: {{ tracking_code_valor }}
+Previsão: {{ previsao | default("23/10/2026") }}
+
+PAGAMENTO
+Transação: {{ transaction_id_valor }}
+Valor total: {{ revenue_valor }}
+Fatura: {{ invoice_number_valor }}
