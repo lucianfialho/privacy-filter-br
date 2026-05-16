@@ -114,6 +114,13 @@ class HaikuGenerator:
             },
             timeout=60,
         )
-        resp.raise_for_status()
         data = resp.json()
-        return data["choices"][0]["message"]["content"].strip()
+        # Common shapes: OpenAI-style {"choices":[{"message":{"content":...}}]}
+        # MiniMax v2 also returns this shape, but errors return base_resp/error fields
+        if "choices" in data:
+            return data["choices"][0]["message"]["content"].strip()
+        # Older MiniMax shape
+        if "reply" in data:
+            return str(data["reply"]).strip()
+        # Surface error details
+        raise RuntimeError(f"MiniMax response (HTTP {resp.status_code}): {data}")
