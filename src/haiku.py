@@ -122,12 +122,25 @@ class HaikuGenerator:
             timeout=60,
         )
         data = resp.json()
-        # Common shapes: OpenAI-style {"choices":[{"message":{"content":...}}]}
-        # MiniMax v2 also returns this shape, but errors return base_resp/error fields
-        if "choices" in data:
-            return data["choices"][0]["message"]["content"].strip()
-        # Older MiniMax shape
-        if "reply" in data:
-            return str(data["reply"]).strip()
-        # Surface error details
-        raise RuntimeError(f"MiniMax response (HTTP {resp.status_code}): {data}")
+
+        # Check for error envelope (MiniMax error responses)
+        base_resp = data.get("base_resp", {})
+        if base_resp and base_resp.get("status_code") not in (0, None):
+            raise RuntimeError(
+                f"MiniMax error {base_resp.get('status_code')}: {base_resp.get('status_msg')}"
+            )
+
+        choices = data.get("choices")
+        if not choices:
+            raise RuntimeError(f"MiniMax response missing 'choices'. Full: {data}")
+
+        msg = choices[0].get("message") or {}
+        content = msg.get("content")
+        if not content:
+            # Sometimes content is in finish_reason or top-level reply
+            finish = choices[0].get("finish_reason")
+            raise RuntimeError(
+                f"MiniMax content empty (finish_reason={finish}). Full: {data}"
+            )
+
+        return content.strip() if isinstance(content, str) else str(content).strip()
