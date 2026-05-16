@@ -3,6 +3,13 @@ import subprocess
 import requests
 from jinja2 import Environment, FileSystemLoader
 
+# Auto-load .env if present
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+except ImportError:
+    pass
+
 CLUE_POSITIONS = {
     "cpf": [
         {"position": "before",  "template": "CPF {value}"},
