@@ -78,6 +78,8 @@ class HaikuGenerator:
     def __init__(self, provider: str | None = None, **kwargs):
         self.provider = (provider or os.getenv("PROVIDER", "claude")).lower()
         self.env = Environment(loader=FileSystemLoader(_TEMPLATES_DIR))
+        if self.provider == "claude":
+            self.claude_model = os.getenv("CLAUDE_MODEL", "haiku")
         if self.provider == "minimax":
             self.minimax_key = os.getenv("MINIMAX_API_KEY", "")
             self.minimax_url = os.getenv(
@@ -102,7 +104,7 @@ class HaikuGenerator:
         # ANTHROPIC_API_KEY might be a placeholder ("your_key_here") that breaks claude.
         env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
         result = subprocess.run(
-            ["claude", "--print"],
+            ["claude", "--print", "--model", self.claude_model],
             input=prompt,
             capture_output=True,
             text=True,

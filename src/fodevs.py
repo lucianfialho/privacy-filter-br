@@ -1,3 +1,4 @@
+import random
 import requests
 import json
 import time
@@ -10,21 +11,31 @@ HEADERS = {
 
 
 class Fodevs4:
-    def __init__(self, base_url: str = FODEVS_URL, delay: float = 0.3):
+    def __init__(self, base_url: str = FODEVS_URL, delay: float = 1.0):
         self.base_url = base_url
         self.delay = delay
 
-    def _post(self, data: str, retries: int = 3) -> str:
+    def _post(self, data: str, retries: int = 5) -> str:
         for attempt in range(retries):
             try:
                 time.sleep(self.delay)
                 resp = requests.post(self.base_url, headers=HEADERS, data=data, timeout=15)
+                if resp.status_code == 429:
+                    wait = 15 + 5 * attempt + random.uniform(0, 5)
+                    if attempt == retries - 1:
+                        resp.raise_for_status()
+                    time.sleep(wait)
+                    continue
                 resp.raise_for_status()
                 return resp.text.strip()
+            except requests.HTTPError:
+                if attempt == retries - 1:
+                    raise
+                time.sleep(2 ** attempt + random.uniform(0, 1))
             except Exception:
                 if attempt == retries - 1:
                     raise
-                time.sleep(2 ** attempt)  # backoff: 1s, 2s
+                time.sleep(2 ** attempt + random.uniform(0, 1))
 
     def gerar_cpf(self) -> str:
         return self._post("acao=gerar_cpf&pontuacao=S")
