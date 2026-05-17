@@ -1,6 +1,8 @@
 import os
 import re
 import subprocess
+import threading
+import time
 import requests
 from jinja2 import Environment, FileSystemLoader
 
@@ -116,7 +118,23 @@ class HaikuGenerator:
             raise RuntimeError(f"claude CLI failed: {err}")
         return result.stdout.strip()
 
+    # Global rate limiter for MiniMax (Starter plan: 1500 req / 5h ≈ 300 req/h).
+    # We aim for 270/h (margin) → 1 request every ~13.3s across ALL workers in this process.
+    _minimax_lock = threading.Lock()
+    _minimax_last = 0.0
+    _minimax_min_interval = float(os.getenv("MINIMAX_MIN_INTERVAL", "13.3"))
+
+    @classmethod
+    def _minimax_throttle(cls) -> None:
+        with cls._minimax_lock:
+            now = time.monotonic()
+            wait = cls._minimax_min_interval - (now - cls._minimax_last)
+            if wait > 0:
+                time.sleep(wait)
+            cls._minimax_last = time.monotonic()
+
     def _generate_minimax(self, prompt: str) -> str:
+        self._minimax_throttle()
         resp = requests.post(
             self.minimax_url,
             headers={
