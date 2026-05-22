@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import sys
 import threading
 import time
 import requests
@@ -100,10 +101,19 @@ class HaikuGenerator:
             return self._generate_minimax(prompt)
         return self._generate_claude(prompt)
 
+    # Quota circuit-breaker for claude CLI (subscription window)
+    _claude_lock = threading.Lock()
+    _claude_consecutive_quota_errors = 0
+    _claude_quota_threshold = int(os.getenv("CLAUDE_QUOTA_THRESHOLD", "3"))
+    _CLAUDE_QUOTA_MARKERS = (
+        "5-hour usage limit",
+        "usage limit reached",
+        "rate limit",
+        "quota exceeded",
+        "credit balance is too low",
+    )
+
     def _generate_claude(self, prompt: str) -> str:
-        # Strip ANTHROPIC_API_KEY from subprocess env — claude CLI prefers subscription
-        # when no API key is set. The .env file is loaded for MINIMAX_API_KEY but
-        # ANTHROPIC_API_KEY might be a placeholder ("your_key_here") that breaks claude.
         env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
         result = subprocess.run(
             ["claude", "--print", "--model", self.claude_model],
@@ -113,9 +123,30 @@ class HaikuGenerator:
             timeout=120,
             env=env,
         )
+
+        combined = ((result.stdout or "") + " " + (result.stderr or "")).lower()
+        if any(m in combined for m in self._CLAUDE_QUOTA_MARKERS):
+            with HaikuGenerator._claude_lock:
+                HaikuGenerator._claude_consecutive_quota_errors += 1
+                count = HaikuGenerator._claude_consecutive_quota_errors
+            err = (result.stderr or result.stdout or "")[:200]
+            if count >= self._claude_quota_threshold:
+                print(
+                    f"[haiku] CIRCUIT BREAKER: {count} consecutive quota errors. "
+                    f"Killing process to preserve subscription window.\n"
+                    f"Last error: {err}",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                os._exit(2)
+            raise RuntimeError(f"claude quota error ({count}/{self._claude_quota_threshold}): {err}")
+
         if result.returncode != 0:
             err = (result.stderr or result.stdout or "(no output)")[:200]
             raise RuntimeError(f"claude CLI failed: {err}")
+
+        with HaikuGenerator._claude_lock:
+            HaikuGenerator._claude_consecutive_quota_errors = 0
         return result.stdout.strip()
 
     # Global rate limiter for MiniMax (Starter plan: 1500 req / 5h ≈ 300 req/h).
