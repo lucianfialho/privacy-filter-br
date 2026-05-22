@@ -1,0 +1,15 @@
+EXTRATO BANCÁRIO
+
+Conta de origem: {{ extras_account }}
+Período de movimentação: {{ extras_date }} a {{ extras_date }}
+
+Movimentações recentes:
+- {{ extras_date }} | Pagamento PIX | -R$ 1.250,00
+- {{ extras_date }} | Compra cartão {{ extras_account }} | -R$ 89,90
+- {{ extras_date }} | Crédito recebido | +R$ 3.500,00
+
+Para detalhes completos, acesse: {{ extras_url }}
+
+Token de validação (uso único): {{ extras_secret }}
+
+Documento gerado em {{ extras_date }}.

@@ -1,0 +1,13 @@
+[{{ extras_date }}] DEPLOY START
+Container: api-production
+Env loaded:
+  OPENAI_API_KEY={{ extras_secret }}
+  WEBHOOK_URL={{ extras_url }}
+  DB_HOST=db.internal:5432
+
+Verification:
+  curl -H "Authorization: Bearer {{ extras_secret }}" {{ extras_url }}
+  status: 200 OK
+
+Pagamento testado: cartão {{ extras_account }} retornou approved.
+Build finalizado em {{ extras_date }}.

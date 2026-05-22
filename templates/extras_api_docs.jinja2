@@ -1,0 +1,24 @@
+# Documentação Interna — Integração API
+
+Última atualização: {{ extras_date }}
+
+## Autenticação
+
+Endpoint base: {{ extras_url }}
+
+Para autenticar, envie no header:
+    Authorization: {{ extras_secret }}
+
+Em caso de erro 401, regenere a chave em {{ extras_url }}.
+
+## Pagamentos
+
+Para testes em sandbox, use o cartão fictício:
+    Número: {{ extras_account }}
+    Validade: {{ extras_date }}
+
+Outra conta para reembolso: {{ extras_account }}
+
+## Suporte
+
+Em caso de incidente após {{ extras_date }}, contate o time DevOps.
