@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "br-pii-guardrail"
+version = "0.1.0"
+description = "PII detection + tokenization guardrail for Brazilian Portuguese (CPF, CNPJ, B2B IDs, etc) with reversible AES-GCM vault for LLM workflows."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Lucian Fialho", email = "lucian@metricasboss.com.br"}]
+keywords = ["pii", "lgpd", "guardrail", "tokenization", "brazil", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "cryptography>=42.0",
+]
+
+[project.optional-dependencies]
+ner = ["transformers>=4.46", "torch>=2.0"]
+pdf = ["pdfplumber>=0.10"]
+all = ["br-pii-guardrail[ner,pdf]"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.urls]
+Homepage = "https://github.com/lucianfialho/privacy-filter-br"
+Repository = "https://github.com/lucianfialho/privacy-filter-br"
+Issues = "https://github.com/lucianfialho/privacy-filter-br/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
