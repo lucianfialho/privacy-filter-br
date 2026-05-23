@@ -27,8 +27,9 @@ dependencies = [
 
 [project.optional-dependencies]
 ner = ["transformers>=4.46", "torch>=2.0"]
+spacy = ["spacy>=3.7"]
 pdf = ["pdfplumber>=0.10"]
-all = ["br-pii-guardrail[ner,pdf]"]
+all = ["br-pii-guardrail[ner,spacy,pdf]"]
 dev = ["pytest>=8.0", "ruff>=0.5"]
 
 [project.urls]
