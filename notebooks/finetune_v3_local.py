@@ -131,6 +131,9 @@ def main():
         model = model.cuda()
         print(f"  GPU: {torch.cuda.get_device_name(0)}")
         print(f"  bf16 supported: {torch.cuda.is_bf16_supported()}")
+    elif torch.backends.mps.is_available():
+        model = model.to("mps")
+        print("  GPU: Apple Silicon (MPS)")
 
     print("Loading datasets...")
     train_ds = load_dataset(args.train_file, tokenizer, args.max_length)
@@ -139,6 +142,7 @@ def main():
 
     bf16 = torch.cuda.is_bf16_supported() if torch.cuda.is_available() else False
     fp16 = torch.cuda.is_available() and not bf16
+    use_mps = (not torch.cuda.is_available()) and torch.backends.mps.is_available()
 
     training_args = TrainingArguments(
         output_dir=args.output_dir,
@@ -160,7 +164,7 @@ def main():
         greater_is_better=True,
         save_total_limit=2,
         report_to="none",
-        dataloader_num_workers=2,
+        dataloader_num_workers=0 if use_mps else 2,
     )
 
     trainer = Trainer(
