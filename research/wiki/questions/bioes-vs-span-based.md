@@ -45,9 +45,15 @@ Could be a quick win: keep BIOES but add Viterbi at inference. Open question: ho
 4. If both: maybe GLiNER (different paradigm entirely).
 ```
 
-## Linked papers (when ingested)
+## Linked papers
 
-- [[2026-XX-XX-spanbert]]
-- [[2026-XX-XX-gliner]]
-- [[2026-XX-XX-biaffine-ner]]
-- [[2026-XX-XX-viterbi-ner]]
+- [[../sources/2026-05-23-gliner]] — span-based, zero-shot. Strongly relevant; addresses fragmentation by design.
+- [[../sources/2026-05-23-spanbert]] — span-aware **pretraining**, not decoding. Suggests the BIOES-vs-span debate is partly upstream of our v3 architecture: our BERTimbau backbone is not span-aware.
+- [[2026-XX-XX-biaffine-ner]] — pending
+- [[2026-XX-XX-viterbi-ner]] — pending
+
+## Related concept/entity pages
+
+- [[../concepts/span-based-ner]]
+- [[../concepts/zero-shot-ner]]
+- [[../entities/gliner-model]]

@@ -35,9 +35,20 @@ updated: 2026-05-23
 3. Can we do **distant supervision** on real BR documents (web-crawled NFs, public contratos, etc) without manual labeling?
 4. **Counterfactual augmentation:** swap entity values within a span and re-label. Does this help generalization?
 
-## Linked papers (when ingested)
+## Linked papers
 
-- [[2026-XX-XX-anaby-tavor]] — generation quality
-- [[2026-XX-XX-karimi-augmentation]] — entity replacement augmentation
-- [[2026-XX-XX-distant-supervision]] — labeling without humans
-- [[2026-XX-XX-deid-gpt]] — clinical de-id, also uses synthetic data
+- [[../sources/2026-05-23-deid-gpt]] — clinical de-id uses i2b2/UTHealth, which is fully PHI-synthetic (real notes + surrogate identifiers). External validation that synthetic-PII benchmarks are credible. See [[../entities/i2b2-uthealth-dataset]].
+- [[../sources/2026-05-23-lambada]] — LM-based generation + classifier-confidence filtering. Most methodologically similar paper to our pipeline. Identifies our **missing filter step** as the architectural gap. See [[../concepts/lm-based-data-augmentation]], [[../concepts/synthetic-data-filtering]].
+- [[2026-XX-XX-karimi-augmentation]] — entity replacement augmentation (pending)
+- [[2026-XX-XX-distant-supervision]] — labeling without humans (pending)
+
+## Concrete next experiments (informed by LAMBADA)
+
+1. **Round-trip filter audit.** ✅ done 2026-05-23 — 16.76% of examples have regex-detectable unlabeled PII.
+2. **v3 disagreement audit.** ✅ done 2026-05-23 — only 0.70% full agreement; v3 finds MORE labels than gold in 99.30% of cases.
+3. **Per-category count audit.** ✅ done 2026-05-23 — under-represented: account_number, private_url, secret, **private_date** (all ~3.5%). Pre-audit hypothesis about private_phone being under-represented was wrong.
+4. **Conditional filter retrain.** Dataset relabeled: 6209 new labels added across 5503 examples (11.04% of dataset). Saved to `data/dataset_br_v3_relabeled.jsonl`. Retrain itself pending user execution.
+
+**Full audit synthesis:** see [[2026-05-23-direction-a-audit-results]].
+
+**Root cause identified:** `src/labeler.py` uses `re.escape(value)` exact-string match. When gpt-5-nano rewriter alters formatting (`-` → `.`, etc.), the labeler silently drops the PII.
