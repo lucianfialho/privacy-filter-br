@@ -1,5 +1,5 @@
 ---
-title: Privacy Filter BR v4 Demo
+title: Privacy Filter BR v3 Demo
 emoji: 🔒
 colorFrom: green
 colorTo: blue
@@ -12,9 +12,9 @@ license: mit
 short_description: Detector de PII em português brasileiro (CPF, CNPJ, B2B IDs)
 ---
 
-# Privacy Filter BR v4 — Interactive Demo
+# Privacy Filter BR v3 — Interactive Demo
 
-Demo Gradio do modelo [`lucianfialho/privacy-filter-br-v4`](https://huggingface.co/lucianfialho/privacy-filter-br-v4).
+Demo Gradio do modelo [`lucianfialho/privacy-filter-br-v3`](https://huggingface.co/lucianfialho/privacy-filter-br-v3).
 
 Cole qualquer texto BR pra ver os PIIs detectados com highlights coloridos por categoria.
 

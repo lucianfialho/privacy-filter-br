@@ -1,4 +1,4 @@
-"""spaCy NER recognizer — complements BERTimbau v4 for person/location detection.
+"""spaCy NER recognizer — complements BERTimbau v3 for person/location detection.
 
 spaCy's pt_core_news_lg is trained on a much larger PT corpus (CONLL-style PER/LOC/ORG)
 and tends to outperform our fine-tuned model on names in free text.
