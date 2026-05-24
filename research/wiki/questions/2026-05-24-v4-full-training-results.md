@@ -1,11 +1,13 @@
 ---
 type: question
-tags: [v4, training, benchmark, label-quality, full-scale]
+tags: [v4, training, benchmark, label-quality, full-scale, superseded]
 sources: 0
 updated: 2026-05-24
 ---
 
 # v4 full training results (2026-05-24)
+
+> ⚠️ **2026-05-24 update — read this first:** the conclusions on this page are based on v4's OWN holdout. A subsequent cross-holdout benchmark revealed v4 has catastrophic distribution-shift failure (F1 0.5534 on v3's holdout, while v3 holds F1 0.9947 on v4's holdout). v3 remains the production default. See [[2026-05-24-v4-postmortem]] for the full diagnosis.
 
 ## Pipeline summary
 

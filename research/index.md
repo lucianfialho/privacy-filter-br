@@ -49,6 +49,8 @@ See [[CLAUDE]] for schema and conventions, [[overview]] for the running thesis.
 - [[wiki/questions/synthetic-data-quality]] — DeID-GPT validation + LAMBADA filter + Dai-Adel mention-replacement
 - [[wiki/questions/2026-05-23-direction-a-audit-results]] — 4-audit findings: labeler bug confirmed, 99.30% v3 disagreement
 - [[wiki/questions/2026-05-23-v3.1-training-results]] — v3.1 trained on relabeled dataset; 2×2 benchmark confirms hypothesis
+- [[wiki/questions/2026-05-24-v4-full-training-results]] — v4 training results (⚠️ superseded by post-mortem)
+- [[wiki/questions/2026-05-24-v4-postmortem]] — cross-holdout reveals v4 overfit; v3 remains production default
 - [[wiki/questions/initial-reading-list]] — tracker (note: 5 original IDs were hallucinated, see notes)
 
 ## Strategic synthesis (where the papers point us)
