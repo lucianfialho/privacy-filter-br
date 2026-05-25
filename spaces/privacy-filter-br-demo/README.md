@@ -12,9 +12,9 @@ license: mit
 short_description: Detector de PII em português brasileiro (CPF, CNPJ, B2B IDs)
 ---
 
-# Privacy Filter BR v6 — Interactive Demo
+# Privacy Filter BR — Interactive Demo
 
-Demo Gradio do modelo [`lucianfialho/privacy-filter-br-v6`](https://huggingface.co/lucianfialho/privacy-filter-br-v6).
+Demo Gradio do modelo [`lucianfialho/privacy-filter-br`](https://huggingface.co/lucianfialho/privacy-filter-br) (latest = v7).
 
 Cole qualquer texto BR pra ver os PIIs detectados com highlights coloridos por categoria.
 

@@ -2,7 +2,7 @@
 
 Two deliverables to publish:
 
-1. **`lucianfialho/privacy-filter-br-v3`** — NER model on HuggingFace Hub
+1. **`lucianfialho/privacy-filter-br`** — NER model on HuggingFace Hub
 2. **`br-pii-guardrail`** — Python lib on PyPI
 
 ---
@@ -19,7 +19,7 @@ huggingface-cli login   # paste write token from https://huggingface.co/settings
 ### Publish
 
 ```bash
-# Defaults: REPO=lucianfialho/privacy-filter-br-v3, MODEL_DIR=checkpoints/v3-local
+# Defaults: REPO=lucianfialho/privacy-filter-br, MODEL_DIR=checkpoints/v3-local
 bash scripts/publish_hf.sh
 
 # Override:
@@ -33,7 +33,7 @@ The script creates a model card (`README.md`) automatically and uploads everythi
 ```python
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
-REPO = "lucianfialho/privacy-filter-br-v3"
+REPO = "lucianfialho/privacy-filter-br"
 tok = AutoTokenizer.from_pretrained(REPO)
 model = AutoModelForTokenClassification.from_pretrained(REPO)
 ner = pipeline("token-classification", model=model, tokenizer=tok, aggregation_strategy="simple")
@@ -109,5 +109,5 @@ git push origin v0.2.0
 Update the Analytics Copilot issue to reference the public model + PyPI lib:
 ```bash
 gh issue comment 274 --repo metricasboss/analytics-copilot \
-  --body "Published: br-pii-guardrail on PyPI, privacy-filter-br-v3 on HF Hub. \`pip install br-pii-guardrail[ner]\` ready to integrate."
+  --body "Published: br-pii-guardrail on PyPI, privacy-filter-br on HF Hub. \`pip install br-pii-guardrail[ner]\` ready to integrate."
 ```

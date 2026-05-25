@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "br-pii-guardrail"
-version = "0.1.4"
+version = "0.1.5"
 description = "PII detection + tokenization guardrail for Brazilian Portuguese (CPF, CNPJ, B2B IDs, etc) with reversible AES-GCM vault for LLM workflows."
 readme = "README.md"
 requires-python = ">=3.10"

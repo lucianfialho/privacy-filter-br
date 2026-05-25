@@ -8,34 +8,25 @@ Repositório completo: modelo + lib de produção + research wiki + scripts de a
 
 | Componente | Onde | Estado |
 | --- | --- | --- |
-| **Modelo v6 (production default)** | [`lucianfialho/privacy-filter-br-v6`](https://huggingface.co/lucianfialho/privacy-filter-br-v6) | publicado |
-| Modelo v5 (anterior) | [`lucianfialho/privacy-filter-br-v6`](https://huggingface.co/lucianfialho/privacy-filter-br-v6) | publicado |
-| Modelo v3 (anterior) | [`lucianfialho/privacy-filter-br-v3`](https://huggingface.co/lucianfialho/privacy-filter-br-v3) | publicado |
-| Modelo v4 (experimental, **não use**) | [`lucianfialho/privacy-filter-br-v4`](https://huggingface.co/lucianfialho/privacy-filter-br-v4) | ⚠️ vê post-mortem |
-| **Demo Gradio** | [`spaces/privacy-filter-br-demo`](https://huggingface.co/spaces/lucianfialho/privacy-filter-br-demo) | live (v6) |
-| **Lib `br-pii-guardrail`** | [`br-pii-guardrail/`](./br-pii-guardrail) | 0.1.4 (regex+checksum+NER+AES vault) |
-| **Research wiki** | [`research/`](./research) | 9 papers + 5 análises (audits/postmortem/v5/v6) |
+| **Modelo NER** | [`lucianfialho/privacy-filter-br`](https://huggingface.co/lucianfialho/privacy-filter-br) | publicado (latest = v7) |
+| **Demo Gradio** | [`spaces/privacy-filter-br-demo`](https://huggingface.co/spaces/lucianfialho/privacy-filter-br-demo) | live |
+| **Lib `br-pii-guardrail`** | [`br-pii-guardrail/`](./br-pii-guardrail) | 0.1.5 (regex+checksum+NER+boundary merger+AES vault) |
+| **Research wiki** | [`research/`](./research) | 9 papers + living `model-evolution.md` |
+
+Repo canônico HF tem tags `v3` (legacy baseline) e `v7` (current) acessíveis via `revision=`. Versões v4, v5, v6 não estão expostas — iterações intermediárias com problemas conhecidos, documentadas em [`research/wiki/questions/model-evolution.md`](./research/wiki/questions/model-evolution.md).
 
 ## Performance
 
-**Métrica:** seqeval BIOES F1.
+**Métrica:** seqeval BIOES micro F1 em sintético, overlap-tolerant em real.
 
-| Modelo | Haiku struct | gpt5nano struct | gpt5nano narrative | Spread |
+| Modelo | Haiku struct | gpt5nano struct | gpt5nano narrative | Phase 1 CVM real (3 cats) |
 | --- | --- | --- | --- | --- |
-| v3 (Haiku-trained) | 0.9901 | 0.9947 | 0.9506 | 0.0441 |
-| v4 (gpt5nano-only) | **0.5534** ⚠️ | 0.9992 | 0.8928 | **0.4459** 💥 |
-| v5 (mixed Haiku+gpt5nano) | 0.9912 | 0.9992 | 0.9564 | 0.0429 |
-| **v6 (mixed + narrative templates)** | **0.9909** | **0.9993** | **0.9991** ✓ | **0.0084** ✓ |
+| v3 | 0.9901 | 0.9947 | 0.9506 | 0.71 |
+| **v7 (+ boundary merger)** | **0.9956** | **0.9993** | **0.9991** | **0.90** |
 
-**v6 generaliza nos 3 estilos.** Spread 5× menor que v5, 53× menor que v4.
+v7 = v3 → v4 → v5 → v6 + boundary merger + CAPS templates + dates-in-prose templates. Spread cross-style 0.0084 (53× menor que v4 catastrófico, 5× menor que v5). Phase 1 CVM real F1 sobe de 0.53 (v6 baseline) → 0.90 (v7 com merger) nas 3 cats endereçáveis (cpf/cnpj/person). História completa: [`research/wiki/questions/model-evolution.md`](./research/wiki/questions/model-evolution.md).
 
-### Resumo da jornada
-
-1. **v3** treinado com Claude Haiku como rewriter — F1 0.9900 no próprio holdout, generaliza ok.
-2. **v3.1** com regex relabel parcial — F1 caiu (-0.0063) por buggy-holdout penalizing.
-3. **v4** com gpt-5-nano + format-aware labeler — F1 0.9992 no próprio holdout MAS apenas 0.5534 no Haiku-style. Aprendeu a estender boundaries em markdown decorators (`**`, `\n`). Post-mortem em [`2026-05-24-v4-postmortem`](./research/wiki/questions/2026-05-24-v4-postmortem.md).
-4. **v5** combina datasets v3+v4 (~100k) — modelo vê AS DUAS distribuições e generaliza ambas. F1 0.9912/0.9992 nos 2 estilos. Detalhes em [`2026-05-24-v5-results`](./research/wiki/questions/2026-05-24-v5-results.md).
-5. **v6** adiciona 10 templates de **prosa narrativa** (artigo, email, doc técnico, chat, etc) + 30k examples → 130k total. **Fixa 2 falhas concretas** que persistiam (CUST→customer_id, revenue em frase livre). F1 0.9991 em narrativo (v5 era 0.9564).
+**Limitação aberta:** `private_date` ainda falha em 100% dos casos reais por bug de instrumentação no labeler — fix planejado para v8. Ver issues [#1](https://github.com/metricasboss/privacy-filter-br/issues/1) (dataset expansion) e [#2](https://github.com/metricasboss/privacy-filter-br/issues/2) (schema v8).
 
 ## ⚠️ Caveat de honestidade
 
@@ -61,8 +52,8 @@ Use [`br-pii-guardrail`](./br-pii-guardrail) para combinar regex+checksum (deter
 ```python
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
-tok = AutoTokenizer.from_pretrained("lucianfialho/privacy-filter-br-v6")
-model = AutoModelForTokenClassification.from_pretrained("lucianfialho/privacy-filter-br-v6")
+tok = AutoTokenizer.from_pretrained("lucianfialho/privacy-filter-br")
+model = AutoModelForTokenClassification.from_pretrained("lucianfialho/privacy-filter-br")
 ner = pipeline("token-classification", model=model, tokenizer=tok,
                aggregation_strategy="simple")
 
@@ -78,7 +69,7 @@ from br_pii_guardrail import Guardrail
 from br_pii_guardrail.ner import NER
 
 # Combina regex+checksum (CPF/CNPJ/cartão) + scanners (JSON/CSV/PDF) + NER
-ner = NER("lucianfialho/privacy-filter-br-v6")
+ner = NER("lucianfialho/privacy-filter-br")
 guard = Guardrail.default(ner=ner)
 
 # Tokeniza com AES-GCM (vault reversível por tenant) antes de mandar pra LLM
@@ -208,6 +199,6 @@ MIT (modelo + lib + scripts). Base BERTimbau é MIT-compatible.
   title = {Privacy Filter BR — NER for Brazilian PII detection},
   year = {2026},
   publisher = {HuggingFace},
-  url = {https://huggingface.co/lucianfialho/privacy-filter-br-v6}
+  url = {https://huggingface.co/lucianfialho/privacy-filter-br}
 }
 ```

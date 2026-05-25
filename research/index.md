@@ -1,6 +1,6 @@
 # Research Wiki Index
 
-Knowledge base for improving `privacy-filter-br-v3` (BR PII detection NER) and the `br-pii-guardrail` library.
+Knowledge base for improving `privacy-filter-br` (BR PII detection NER) and the `br-pii-guardrail` library.
 
 See [[CLAUDE]] for schema and conventions, [[overview]] for the running thesis.
 

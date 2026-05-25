@@ -83,7 +83,8 @@ For prose / free text where regex misses (descriptions, comments, etc):
 ```python
 from br_pii_guardrail.ner import NER
 
-ner = NER(model_path="lucianfialho/privacy-filter-br-v6")  # HF Hub or local path
+ner = NER(model_path="lucianfialho/privacy-filter-br")  # HF Hub canonical (latest = v7)
+# Pin a version: NER(model_path="lucianfialho/privacy-filter-br", revision="v7")
 guard = Guardrail.default(ner=ner)
 guard.use_ner_fallback = True  # only run NER when regex finds nothing
 
