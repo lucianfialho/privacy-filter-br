@@ -2,16 +2,20 @@
 
 Loads data/phase1_b2b.jsonl and scores per category with both exact and
 overlap matching, plus delta vs synthetic-holdout F1 — quantifies the
-synthetic→real gap.
+synthetic→real gap. Boundary merger (from br_pii_guardrail) applied by
+default — fixes BIOES sub-token fragmentation that broke exact-match.
 """
 from __future__ import annotations
 
+import argparse
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-INPUT = ROOT / "data/phase1_b2b.jsonl"
+sys.path.insert(0, str(ROOT / "br-pii-guardrail/src"))
+from br_pii_guardrail.ner import _merge_adjacent_spans  # noqa: E402
 
 SYNTHETIC_F1 = {
     "private_cnpj": 0.9970,
@@ -28,13 +32,18 @@ def overlaps(a_s, a_e, b_s, b_e):
 def main() -> None:
     from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
-    with INPUT.open() as f:
-        docs = [json.loads(line) for line in f]
-    print(f"Loaded {len(docs)} B2B docs from {INPUT}")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model", default="checkpoints/v7-local")
+    ap.add_argument("--input", default=str(ROOT / "data/phase1_b2b.jsonl"))
+    ap.add_argument("--no-merge", action="store_true", help="disable boundary merger")
+    args = ap.parse_args()
 
-    print("Loading v6...")
-    tok = AutoTokenizer.from_pretrained("checkpoints/v6-local", model_max_length=512)
-    model = AutoModelForTokenClassification.from_pretrained("checkpoints/v6-local").eval()
+    with open(args.input) as f:
+        docs = [json.loads(line) for line in f]
+    print(f"Loaded {len(docs)} B2B docs from {args.input}")
+    print(f"Loading {args.model} (boundary merger {'OFF' if args.no_merge else 'ON'})...")
+    tok = AutoTokenizer.from_pretrained(args.model, model_max_length=512)
+    model = AutoModelForTokenClassification.from_pretrained(args.model).eval()
     ner = pipeline("token-classification", model=model, tokenizer=tok,
                    aggregation_strategy="simple", device=-1)
 
@@ -55,7 +64,9 @@ def main() -> None:
         text = doc["text"][:1500]
         gold_in_range = [e for e in doc["entities"] if e["end"] <= 1500]
         text_short = text
-        preds = ner(text_short)
+        preds = list(ner(text_short))
+        if not args.no_merge:
+            preds = _merge_adjacent_spans(preds, text_short, max_gap=3)
 
         gold_in_scope = [e for e in gold_in_range if e["label"] in gold_categories]
         pred_in_scope = [p for p in preds if p["entity_group"] in gold_categories]
@@ -101,7 +112,7 @@ def main() -> None:
 
     print()
     print("=" * 80)
-    print("v6 on REAL CVM B2B docs (30 examples, 120 gold spans)")
+    print(f"{args.model} on REAL CVM B2B (merger={'off' if args.no_merge else 'on'}, n={len(docs)})")
     print("=" * 80)
     print(f"{'category':<22} {'mode':<8} {'TP':>4} {'FP':>4} {'FN':>4} {'P':>8} {'R':>8} {'F1':>8} {'synth':>8} {'Δ':>8}")
     print("-" * 80)
