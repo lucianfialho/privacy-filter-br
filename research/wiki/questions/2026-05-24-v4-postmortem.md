@@ -163,7 +163,5 @@ To get a model that actually beats v3, we need to:
 
 ## Related
 
-- [[2026-05-24-v4-full-training-results]] — the v4 training results (now needs cross-holdout footnote)
-- [[2026-05-24-phase-2-labeler-fix]] — labeler fix (still valid, the problem was downstream)
-- [[2026-05-23-v3.1-training-results]] — earlier methodology that prefigured this
+- [[model-evolution]] — living doc covering v3 → v3.1 → v4 → v5 → v6 → v7 (v4 section + Phase 2 labeler fix live there now)
 - [[../sources/2026-05-23-lambada]] — LAMBADA explicitly warned about data drifting from single-source generation
