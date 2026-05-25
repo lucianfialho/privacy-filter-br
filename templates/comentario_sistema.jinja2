@@ -1,0 +1,25 @@
+## Ticket #4521 - Histórico de alterações
+
+**[01:23]** Sistema | Pedido {{ order_id_valor }} criado para o cliente {{ customer_id_valor }}.
+
+**[01:24]** Sistema | Validação de CPF {{ cpf_valor }} aprovada via Receita Federal.
+
+**[01:25]** {{ nome }} (atendente) | "Cliente {{ customer_id_valor }} ligou no {{ celular_valor }}
+confirmando endereço {{ endereco }}, {{ cidade }}/{{ estado }}, CEP {{ cep_valor }}. Liberar
+emissão da NF."
+
+**[02:10]** Sistema | Nota fiscal {{ invoice_number_valor }} emitida no valor de
+{{ revenue_valor }}.
+
+**[02:11]** Sistema | Transação de pagamento {{ transaction_id_valor }} processada com sucesso.
+
+**[03:45]** {{ nome }} (logística) | "Despachei o pedido {{ order_id_valor }}. Código de
+rastreio dos Correios: {{ tracking_code_valor }}."
+
+**[09:30]** {{ nome }} (cliente) escreveu via formulário web ({{ email }}): "Recebi tudo
+certinho, obrigado!"
+
+---
+
+*Notas internas:* identificador do cliente no CRM = {{ customer_id_valor }}. Não confundir com
+o ID do pedido, que é {{ order_id_valor }}. RG arquivado: {{ rg_valor }}. PIS: {{ pis_valor }}.

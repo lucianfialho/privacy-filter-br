@@ -1,0 +1,24 @@
+# Como interpretar os dados de pedido na API v2
+
+A API retorna o objeto Pedido contendo identificadores do cliente e do pedido propriamente
+dito. **Atenção: estes são valores diferentes** e confundi-los gera erros de cobrança.
+
+## Exemplo de payload
+
+Para o cliente {{ nome }} (CPF {{ cpf_valor }}), o registro no nosso CRM aparece com o
+identificador de cliente `{{ customer_id_valor }}` (campo `customer_id`). Já o pedido que
+ele fez na semana passada possui o código `{{ order_id_valor }}` (campo `order_id`).
+
+O cliente reside em {{ endereco }}, {{ cidade }}/{{ estado }}, CEP {{ cep_valor }}, e pode
+ser contatado pelo telefone {{ celular_valor }} ou e-mail {{ email }}.
+
+## Faturamento do cliente
+
+O cliente {{ customer_id_valor }} acumulou {{ revenue_valor }} em vendas no último ano fiscal.
+A nota fiscal mais recente é a {{ invoice_number_valor }}, vinculada ao pedido
+{{ order_id_valor }}, com transação {{ transaction_id_valor }} e rastreio
+{{ tracking_code_valor }}.
+
+> **Importante:** ao integrar com sistemas downstream, garanta que o campo `customer_id`
+> e `order_id` sejam tratados como entidades distintas. Mistura desses campos pode causar
+> mascaramento incorreto de PII.

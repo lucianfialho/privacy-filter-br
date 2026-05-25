@@ -51,7 +51,8 @@ See [[CLAUDE]] for schema and conventions, [[overview]] for the running thesis.
 - [[wiki/questions/2026-05-23-v3.1-training-results]] — v3.1 trained on relabeled dataset; 2×2 benchmark confirms hypothesis
 - [[wiki/questions/2026-05-24-v4-full-training-results]] — v4 training results (⚠️ superseded by post-mortem)
 - [[wiki/questions/2026-05-24-v4-postmortem]] — cross-holdout reveals v4 overfit; v3 became default temporarily
-- [[wiki/questions/2026-05-24-v5-results]] — v5 (mixed Haiku + gpt5nano) generalizes both styles; new production default
+- [[wiki/questions/2026-05-24-v5-results]] — v5 (mixed Haiku + gpt5nano) generalizes both styles
+- [[wiki/questions/2026-05-25-v6-results]] — v6 (+ 10 narrative templates) fixes template-coverage failures; new production default
 - [[wiki/questions/initial-reading-list]] — tracker (note: 5 original IDs were hallucinated, see notes)
 
 ## Strategic synthesis (where the papers point us)

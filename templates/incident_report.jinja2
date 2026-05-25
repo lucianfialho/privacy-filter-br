@@ -1,0 +1,39 @@
+RELATÓRIO DE INCIDENTE DE SEGURANÇA
+
+Data do incidente: vide cabeçalho do sistema.
+Responsável pela apuração: {{ nome }} (contato: {{ celular_valor }}, {{ email }}).
+
+## Resumo
+
+Foi detectado vazamento parcial de dados de um cliente da plataforma. Após investigação
+inicial, confirmou-se que o cliente afetado é o {{ nome }} (identificador interno
+{{ customer_id_valor }}, CPF {{ cpf_valor }}, residente em {{ cidade }}/{{ estado }}).
+
+## Dados expostos
+
+Durante o intervalo entre 14h12 e 14h47, os seguintes registros do cliente
+{{ customer_id_valor }} foram acessíveis indevidamente:
+
+- Nome completo: {{ nome }}
+- CPF: {{ cpf_valor }}
+- RG: {{ rg_valor }}
+- Endereço: {{ endereco }}, CEP {{ cep_valor }}
+- Telefone: {{ celular_valor }}
+- E-mail: {{ email }}
+- Histórico de pedidos (incluindo o {{ order_id_valor }}, no valor de {{ revenue_valor }})
+- Transações financeiras (referência {{ transaction_id_valor }})
+- Nota fiscal {{ invoice_number_valor }}
+
+## Empresa do cliente (se aplicável)
+
+O cliente {{ customer_id_valor }} também é titular da pessoa jurídica de CNPJ
+{{ cnpj_valor }}, inscrição estadual {{ ie_valor }}.
+
+## Ações tomadas
+
+1. Endpoint de leitura foi bloqueado às 14:48.
+2. Logs de acesso (rastreio interno {{ tracking_code_valor }}) preservados para auditoria.
+3. Cliente {{ customer_id_valor }} notificado conforme exigência LGPD.
+
+Encerro este relatório,
+{{ nome }} | Equipe de Segurança da Informação

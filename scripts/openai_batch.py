@@ -44,12 +44,18 @@ from src.validator import validate_example, ValidationResult
 from src.extras import build_extras_perfil
 
 TEMPLATES = [
+    # Structured documents (v1-v5 baseline)
     "email", "nfe", "contrato", "holerite",
     "certidao", "cadastro", "comunicado", "relatorio",
     "nfe_completa", "darf", "boleto",
     "comprovante_pix", "extrato_bancario", "fatura_servico",
     "pedido_marketplace", "dashboard_vendas",
     "comprovante_delivery", "relatorio_faturamento",
+    # Narrative / conversational (v6 — fix CUST/order disambig + revenue in prose)
+    "artigo_noticia", "email_conversacional", "doc_tecnico",
+    "nota_livre", "dialogo_chat", "email_thread",
+    "comentario_sistema", "artigo_blog",
+    "rh_perfil_narrativo", "incident_report",
 ]
 
 EXTRAS_TEMPLATES = [
