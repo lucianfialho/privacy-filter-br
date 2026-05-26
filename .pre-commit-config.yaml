@@ -1,0 +1,20 @@
+repos:
+  - repo: local
+    hooks:
+      - id: audit-reminder-on-labeler-change
+        name: Remind to re-audit dataset after labeler/instrumentation change
+        description: |
+          Soft reminder hook. Fires when src/labeler.py, src/variants.py, or
+          src/batch/instrumentation.py is modified — these are the files whose
+          bugs caused the v7 instrumentation gap (see issue #3). After changing
+          them, regenerate any in-flight dataset and run:
+
+            python scripts/audit_label_distribution.py data/dataset_br_<latest>.jsonl
+
+          The audit also runs automatically at the end of `cmd_process` in
+          src/batch/process.py — this hook is the upstream complement.
+        entry: bash -c 'echo "⚠️  You changed labeler/instrumentation/variants code."; echo "    Re-audit any in-flight dataset before training:"; echo "      python scripts/audit_label_distribution.py data/dataset_br_<latest>.jsonl"; echo ""'
+        language: system
+        files: ^src/(labeler\.py|variants\.py|batch/instrumentation\.py)$
+        pass_filenames: false
+        require_serial: true
