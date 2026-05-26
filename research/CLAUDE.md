@@ -2,7 +2,7 @@
 
 This directory is an LLM-maintained research wiki following the Karpathy "LLM wiki" pattern (https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
-**Goal:** build a persistent, compounding knowledge base about NER for PII detection in Brazilian Portuguese, to inform improvements to the `privacy-filter-br-v3` model and the `br-pii-guardrail` library.
+**Goal:** build a persistent, compounding knowledge base about NER for PII detection in Brazilian Portuguese, to inform improvements to the `privacy-filter-br` model and the `br-pii-guardrail` library.
 
 ## Directory layout
 

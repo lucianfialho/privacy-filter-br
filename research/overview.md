@@ -7,7 +7,7 @@ updated: 2026-05-23
 
 ## Running thesis (as of 2026-05-23)
 
-We trained `privacy-filter-br-v3`: BERTimbau (110M) fine-tuned on 54k synthetic BR examples covering 22 PII categories. F1 macro 0.9934 on a synthetic holdout.
+We trained `privacy-filter-br`: BERTimbau (110M) fine-tuned on 54k synthetic BR examples covering 22 PII categories. F1 macro 0.9934 on a synthetic holdout.
 
 **It works for structured data** (JSON/CSV) when combined with regex+checksum recognizers via `br-pii-guardrail`. Schema-aware detection covers ~90% of Analytics Copilot input where PII comes in fields with known names (`cpf`, `email`, `order_id`).
 

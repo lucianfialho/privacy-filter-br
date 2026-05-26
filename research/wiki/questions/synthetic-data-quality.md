@@ -49,6 +49,6 @@ updated: 2026-05-23
 3. **Per-category count audit.** ✅ done 2026-05-23 — under-represented: account_number, private_url, secret, **private_date** (all ~3.5%). Pre-audit hypothesis about private_phone being under-represented was wrong.
 4. **Conditional filter retrain.** Dataset relabeled: 6209 new labels added across 5503 examples (11.04% of dataset). Saved to `data/dataset_br_v3_relabeled.jsonl`. Retrain itself pending user execution.
 
-**Full audit synthesis:** see [[2026-05-23-direction-a-audit-results]].
+**Full audit synthesis:** see [[model-evolution#v3-1-first-iteration-filter-retrain-marginal-gains]].
 
 **Root cause identified:** `src/labeler.py` uses `re.escape(value)` exact-string match. When gpt-5-nano rewriter alters formatting (`-` → `.`, etc.), the labeler silently drops the PII.

@@ -31,11 +31,13 @@ class NER:
         )
 
     def find(self, text: str) -> list[Match]:
-        """Run NER and return Match list."""
+        """Run NER and return Match list. Merges adjacent same-label spans."""
         if not text:
             return []
+        raw = list(self.pipeline(text))
+        merged = _merge_adjacent_spans(raw, text, max_gap=3)
         out: list[Match] = []
-        for ent in self.pipeline(text):
+        for ent in merged:
             label = ent["entity_group"]
             start, end = ent["start"], ent["end"]
             out.append(Match(
@@ -44,3 +46,33 @@ class NER:
                 confidence=float(ent["score"]),
             ))
         return out
+
+
+def _merge_adjacent_spans(predictions: list[dict], text: str, max_gap: int = 3) -> list[dict]:
+    """Merge contiguous predictions of the same label that are separated by
+    <= max_gap characters of separator-only content (e.g., punctuation, whitespace,
+    sub-word boundaries from BERT WordPiece tokenization).
+
+    Fixes the BIOES sub-token fragmentation seen in v6+:
+      pred 1: '792.498.927-' (private_cpf, score=0.99)
+      pred 2: '72'           (private_cpf, score=0.99)
+      ↓ merged
+      pred:   '792.498.927-72' (private_cpf, score=0.99)
+    """
+    if not predictions:
+        return predictions
+    sorted_preds = sorted(predictions, key=lambda p: p["start"])
+    merged = [dict(sorted_preds[0])]
+    for p in sorted_preds[1:]:
+        last = merged[-1]
+        gap_text = text[last["end"]:p["start"]]
+        is_separator_gap = all(c in ".-/() \t  \n" for c in gap_text)
+        if (p["entity_group"] == last["entity_group"]
+                and (p["start"] - last["end"]) <= max_gap
+                and is_separator_gap):
+            last["end"] = p["end"]
+            last["score"] = min(last["score"], p["score"])
+            last["word"] = text[last["start"]:last["end"]]
+        else:
+            merged.append(dict(p))
+    return merged

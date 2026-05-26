@@ -1,6 +1,6 @@
 # Research Wiki Index
 
-Knowledge base for improving `privacy-filter-br-v3` (BR PII detection NER) and the `br-pii-guardrail` library.
+Knowledge base for improving `privacy-filter-br` (BR PII detection NER) and the `br-pii-guardrail` library.
 
 See [[CLAUDE]] for schema and conventions, [[overview]] for the running thesis.
 
@@ -47,12 +47,8 @@ See [[CLAUDE]] for schema and conventions, [[overview]] for the running thesis.
 - [[wiki/questions/bioes-vs-span-based]] — informed by GLiNER + SpanBERT + LUKE + Template-NER
 - [[wiki/questions/person-detection-failure-modes]] — Dai-Adel mention-replacement is directly applicable
 - [[wiki/questions/synthetic-data-quality]] — DeID-GPT validation + LAMBADA filter + Dai-Adel mention-replacement
-- [[wiki/questions/2026-05-23-direction-a-audit-results]] — 4-audit findings: labeler bug confirmed, 99.30% v3 disagreement
-- [[wiki/questions/2026-05-23-v3.1-training-results]] — v3.1 trained on relabeled dataset; 2×2 benchmark confirms hypothesis
-- [[wiki/questions/2026-05-24-v4-full-training-results]] — v4 training results (⚠️ superseded by post-mortem)
-- [[wiki/questions/2026-05-24-v4-postmortem]] — cross-holdout reveals v4 overfit; v3 became default temporarily
-- [[wiki/questions/2026-05-24-v5-results]] — v5 (mixed Haiku + gpt5nano) generalizes both styles
-- [[wiki/questions/2026-05-25-v6-results]] — v6 (+ 10 narrative templates) fixes template-coverage failures; new production default
+- [[wiki/questions/model-evolution]] — **living doc** tracking v3 → v3.1 → v4 → v5 → v6 → v7 (consolidates the per-version pages)
+- [[wiki/questions/2026-05-24-v4-postmortem]] — full incident report: cross-holdout reveals v4 overfit (kept standalone)
 - [[wiki/questions/initial-reading-list]] — tracker (note: 5 original IDs were hallucinated, see notes)
 
 ## Strategic synthesis (where the papers point us)

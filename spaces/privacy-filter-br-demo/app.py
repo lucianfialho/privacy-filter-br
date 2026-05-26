@@ -6,7 +6,7 @@ from collections import defaultdict
 import gradio as gr
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
-MODEL = os.environ.get("MODEL_ID", "lucianfialho/privacy-filter-br-v6")
+MODEL = os.environ.get("MODEL_ID", "lucianfialho/privacy-filter-br")
 
 print(f"Loading {MODEL}...")
 tok = AutoTokenizer.from_pretrained(MODEL)
@@ -141,7 +141,7 @@ with gr.Blocks(title="Privacy Filter BR v6", theme=gr.themes.Soft()) as demo:
         Detector de PII em português brasileiro. **22 categorias**: CPF, CNPJ, RG, telefone, email, endereço, e categorias B2B (order_id, customer_id, tracking, invoice, revenue).
 
         - **F1 macro 0.9934** no holdout sintético
-        - Modelo: [`lucianfialho/privacy-filter-br-v6`](https://huggingface.co/lucianfialho/privacy-filter-br-v6) — BERTimbau 110M
+        - Modelo: [`lucianfialho/privacy-filter-br`](https://huggingface.co/lucianfialho/privacy-filter-br) — BERTimbau 110M (latest = v7, boundary-merged, Phase 1 CVM F1 0.90 overlap)
         - Lib de produção (regex+checksum+tokenization): [`br-pii-guardrail`](https://github.com/lucianfialho/privacy-filter-br/tree/main/br-pii-guardrail)
         """
     )
