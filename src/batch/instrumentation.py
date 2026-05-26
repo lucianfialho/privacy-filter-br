@@ -7,8 +7,16 @@ training-data corruption (see issue #3: data_nasc/endereco never registered).
 """
 from __future__ import annotations
 
+import unicodedata
+
 from src.batch.config import JINJA, PROMPT_PREFIX
 from src.variants import get_variants_for_perfil, pick_variant
+
+
+def _strip_accents(s: str) -> str:
+    """ASCII-fold by removing combining accents. 'João' → 'Joao'."""
+    return "".join(c for c in unicodedata.normalize("NFD", s)
+                   if unicodedata.category(c) != "Mn")
 
 
 def build_prompt_and_metadata(perfil: dict, template_name: str) -> tuple[str, dict[str, str]]:
@@ -26,13 +34,18 @@ def build_prompt_and_metadata(perfil: dict, template_name: str) -> tuple[str, di
             if v:
                 inserted[v] = lbl
 
-    # Name variants — real-world docs use Title Case, ALL-CAPS (formal docs),
-    # and the literal form from the profile. Register all three so labeler
-    # catches whichever the rewriter emits.
+    # Name variants — real-world docs use multiple cases (Title Case in
+    # contracts, ALL-CAPS in formal docs, lowercase in informal/email, and
+    # sometimes accent-stripped from OCR or terminal-only systems). Register
+    # all combinations (deduped via set) so labeler catches whichever the
+    # rewriter or downstream input emits.
     nome = perfil["nome"]
-    inserted[nome] = "PRIVATE_PERSON"
-    inserted[nome.upper()] = "PRIVATE_PERSON"
-    inserted[nome.title()] = "PRIVATE_PERSON"
+    nome_ascii = _strip_accents(nome)
+    for variant in {
+        nome, nome.upper(), nome.title(), nome.lower(),
+        nome_ascii, nome_ascii.upper(), nome_ascii.title(), nome_ascii.lower(),
+    }:
+        inserted[variant] = "PRIVATE_PERSON"
     inserted[perfil["email"]] = "PRIVATE_EMAIL"
 
     # Date — register canonical (DD/MM/YYYY from 4devs) plus common separator
