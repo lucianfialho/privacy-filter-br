@@ -14,6 +14,14 @@ TEMPLATES = [
     "nota_livre", "dialogo_chat", "email_thread",
     "comentario_sistema", "artigo_blog",
     "rh_perfil_narrativo", "incident_report",
+    # Formal CAPS / date-in-prose (v7 — Phase 1 CAPS+date fix)
+    "ata_assembleia", "edital_oficial", "cadastro_administrador",
+    # Public-document derived (v8 — mirror real BR docs to reduce rewriter
+    # context-token overfit. CVM FRE, RFB CNPJ, JUCESP, DOU, SINTEGRA, B3.
+    # Adds date diversity: "nascido em", "vigência X a Y", "desde Z", "em DD/MM/YYYY")
+    "cvm_fre_administrador", "rfb_cnpj_cadastro", "jucesp_ato_societario",
+    "dou_publicacao_oficial", "sintegra_consulta", "b3_fato_relevante",
+    "timeline_evento",
 ]
 
 EXTRAS_TEMPLATES = [

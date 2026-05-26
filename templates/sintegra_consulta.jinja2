@@ -1,0 +1,27 @@
+SINTEGRA — CONSULTA DE CONTRIBUINTE DO ICMS
+
+UF: {{ estado }}
+CNPJ: {{ cnpj_valor }}
+INSCRIÇÃO ESTADUAL: {{ ie_valor }}
+RAZÃO SOCIAL: EMPRESA {{ nome_upper }} S.A.
+NOME FANTASIA: {{ nome }} Comércio
+DATA DE INSCRIÇÃO ESTADUAL: {{ data_nasc }}
+
+ENDEREÇO DO ESTABELECIMENTO:
+  Logradouro: {{ endereco }}
+  Bairro: Centro
+  Município: {{ cidade }}
+  CEP: {{ cep_valor }}
+
+CONTATO:
+  Telefone: {{ celular_valor }}
+  E-mail: {{ email }}
+
+REGIME DE APURAÇÃO: Lucro Real
+SITUAÇÃO CADASTRAL VIGENTE: Habilitado, desde {{ data_nasc }}.
+DATA DA ÚLTIMA ATUALIZAÇÃO: {{ data_nasc }}.
+
+REPRESENTANTE LEGAL: {{ nome }}, CPF {{ cpf_valor }}, RG {{ rg_valor }},
+PIS {{ pis_valor }}, nascido em {{ data_nasc }}.
+
+Faturamento bruto anual declarado: {{ revenue_valor }}. Pedido: {{ order_id_valor }}.
