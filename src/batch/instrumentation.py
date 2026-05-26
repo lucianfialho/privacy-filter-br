@@ -26,14 +26,38 @@ def build_prompt_and_metadata(perfil: dict, template_name: str) -> tuple[str, di
             if v:
                 inserted[v] = lbl
 
-    inserted[perfil["nome"]] = "PRIVATE_PERSON"
+    # Name variants — real-world docs use Title Case, ALL-CAPS (formal docs),
+    # and the literal form from the profile. Register all three so labeler
+    # catches whichever the rewriter emits.
+    nome = perfil["nome"]
+    inserted[nome] = "PRIVATE_PERSON"
+    inserted[nome.upper()] = "PRIVATE_PERSON"
+    inserted[nome.title()] = "PRIVATE_PERSON"
     inserted[perfil["email"]] = "PRIVATE_EMAIL"
-    chosen["nome"] = perfil["nome"]
+
+    # Date — register canonical (DD/MM/YYYY from 4devs) plus common separator
+    # variants the rewriter might emit. Not added to _FORMAT_AWARE_LABELS in
+    # src/labeler.py — skeleton match on 8-digit dates would FP on unrelated IDs.
+    data_nasc = perfil["data_nasc"]
+    inserted[data_nasc] = "PRIVATE_DATE"
+    inserted[data_nasc.replace("/", "-")] = "PRIVATE_DATE"
+    inserted[data_nasc.replace("/", ".")] = "PRIVATE_DATE"
+
+    # Address — full street + structured prefix (street + number). CEPs are
+    # still labeled via variantes_cep in the variants loop above.
+    endereco = perfil["endereco"]
+    inserted[endereco] = "PRIVATE_ADDRESS"
+    parts = endereco.split(",")
+    if len(parts) >= 2:
+        inserted[",".join(parts[:2]).strip()] = "PRIVATE_ADDRESS"
+
+    chosen["nome"] = nome
+    chosen["nome_upper"] = nome.upper()
     chosen["email"] = perfil["email"]
     chosen["cidade"] = perfil["cidade"]
     chosen["estado"] = perfil["estado"]
-    chosen["data_nasc"] = perfil["data_nasc"]
-    chosen["endereco"] = perfil["endereco"]
+    chosen["data_nasc"] = data_nasc
+    chosen["endereco"] = endereco
 
     tpl = JINJA.get_template(f"{template_name}.jinja2")
     rendered = tpl.render(**chosen)

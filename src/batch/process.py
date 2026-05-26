@@ -87,6 +87,10 @@ def cmd_process(args) -> None:
         if result != ValidationResult.VALID:
             stats["invalid"] += 1
             continue
+        # Normalize labels to lowercase to match training/holdout convention
+        # (label_text emits UPPERCASE; downstream training expects lowercase).
+        for ent in example["entities"]:
+            ent["label"] = ent["label"].lower()
         example["template"] = meta["template"]
         out_line = json.dumps(example, ensure_ascii=False) + "\n"
         if random.random() < args.holdout_ratio:
