@@ -20,6 +20,7 @@ Usage on local machine:
 """
 import os
 import json
+import random
 import argparse
 
 import numpy as np
@@ -31,8 +32,26 @@ from transformers import (
     TrainingArguments,
     Trainer,
     DataCollatorForTokenClassification,
+    set_seed,
 )
 from seqeval.metrics import f1_score, precision_score, recall_score, classification_report
+
+
+def _pin_all_seeds(seed: int) -> None:
+    """Pin Python random, NumPy, PyTorch (CPU + CUDA), and Transformers seeds.
+    Without this, runs are non-reproducible — model init, data shuffle, and
+    dropout all sample from RNGs, so v_N vs v_{N+1} comparisons get noise
+    from initialization mixed with the actual change. set_seed() sets all
+    HuggingFace-managed sources but not Python random or torch CUDA — pin
+    explicitly to be safe.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    set_seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
 
 
 ORIG_CATEGORIES = [
@@ -115,8 +134,12 @@ def main():
     parser.add_argument("--grad-accum", type=int, default=2)
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--max-length", type=int, default=256)
+    parser.add_argument("--seed", type=int, default=42,
+                        help="Random seed pinned across Python/NumPy/PyTorch/HF for reproducibility.")
     args = parser.parse_args()
 
+    _pin_all_seeds(args.seed)
+    print(f"Seed pinned: {args.seed}")
     print(f"Loading tokenizer from {args.base_model}...")
     tokenizer = AutoTokenizer.from_pretrained(args.base_model)
 
@@ -165,6 +188,8 @@ def main():
         save_total_limit=2,
         report_to="none",
         dataloader_num_workers=0 if use_mps else 2,
+        seed=args.seed,
+        data_seed=args.seed,
     )
 
     trainer = Trainer(
