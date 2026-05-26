@@ -26,7 +26,7 @@ Repo canônico HF tem tags `v3` (legacy baseline) e `v7` (current) acessíveis v
 
 v7 = v3 → v4 → v5 → v6 + boundary merger + CAPS templates + dates-in-prose templates. Spread cross-style 0.0084 (53× menor que v4 catastrófico, 5× menor que v5). Phase 1 CVM real F1 sobe de 0.53 (v6 baseline) → 0.90 (v7 com merger) nas 3 cats endereçáveis (cpf/cnpj/person). História completa: [`research/wiki/questions/model-evolution.md`](./research/wiki/questions/model-evolution.md).
 
-**Limitação aberta:** `private_date` ainda falha em 100% dos casos reais por bug de instrumentação no labeler — fix planejado para v8. Ver issues [#1](https://github.com/metricasboss/privacy-filter-br/issues/1) (dataset expansion) e [#2](https://github.com/metricasboss/privacy-filter-br/issues/2) (schema v8).
+**Limitação aberta:** `private_date` ainda falha em 100% dos casos reais por bug de instrumentação no labeler — fix planejado para v8. Ver issues [#1](https://github.com/lucianfialho/privacy-filter-br/issues/1) (dataset expansion) e [#2](https://github.com/lucianfialho/privacy-filter-br/issues/2) (schema v8).
 
 ## ⚠️ Caveat de honestidade
 
