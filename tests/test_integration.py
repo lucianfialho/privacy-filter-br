@@ -31,12 +31,21 @@ def test_generate_20_examples_real_apis():
 
     assert len(examples) >= 15, f"Only got {len(examples)}/20 valid examples after {attempts} attempts"
 
-    valid_labels = {
+    # All 22 categories in the schema (must stay in sync with src/labeler.py
+    # and notebooks/finetune_v3_local.py CATEGORIES list). Match case-insensitively
+    # so the test passes regardless of upstream UPPERCASE/lowercase normalization.
+    valid_labels = {label.lower() for label in {
+        # OAI-compatible (8)
+        "PRIVATE_PERSON", "PRIVATE_EMAIL", "PRIVATE_ADDRESS", "PRIVATE_DATE",
+        "PRIVATE_PHONE", "PRIVATE_URL", "ACCOUNT_NUMBER", "SECRET",
+        # BR-specific structured (9)
         "PRIVATE_CPF", "PRIVATE_CNPJ", "PRIVATE_RG", "PRIVATE_CNH",
         "PRIVATE_PIS", "PRIVATE_TITULO_ELEITOR", "PRIVATE_CERTIDAO",
-        "PRIVATE_IE", "PRIVATE_PERSON", "PRIVATE_EMAIL",
-        "PRIVATE_PHONE", "PRIVATE_ADDRESS", "PRIVATE_DATE"
-    }
+        "PRIVATE_IE", "PRIVATE_CUSTOMER_ID",
+        # BR B2B / commerce (5)
+        "PRIVATE_ORDER_ID", "PRIVATE_TRACKING_CODE", "PRIVATE_INVOICE_NUMBER",
+        "PRIVATE_CLIENT_REVENUE", "PRIVATE_TRANSACTION_ID",
+    }}
 
     for ex in examples:
         assert "text" in ex
@@ -44,7 +53,7 @@ def test_generate_20_examples_real_apis():
         assert len(ex["text"]) >= 50
         assert len(ex["entities"]) >= 2
         for ent in ex["entities"]:
-            assert ent["label"] in valid_labels, f"Unknown label: {ent['label']}"
+            assert ent["label"].lower() in valid_labels, f"Unknown label: {ent['label']}"
 
     acceptance_rate = len(examples) / attempts * 100
     print(f"\nAcceptance rate: {acceptance_rate:.0f}% ({len(examples)}/{attempts})")
