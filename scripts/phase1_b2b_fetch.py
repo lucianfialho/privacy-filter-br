@@ -60,7 +60,11 @@ def build_doc(row: dict) -> dict | None:
         f"Experiência profissional:\n{experiencia}"
     )
 
-    # Build gold entities for known fields
+    # Build gold entities for known fields. Note: private_address is NOT
+    # auto-derived — CVM CSV has no address field per board member, and the
+    # Experiência prose rarely mentions street addresses (it's career history).
+    # Address gold annotation is deferred to Phase 1 v2 (issue #1) where
+    # source diversity (boletos, contratos, NF-e) makes addresses present.
     entities = []
     for value, label in [
         (nome, "private_person"),
