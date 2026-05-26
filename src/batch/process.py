@@ -111,7 +111,10 @@ def cmd_process(args) -> None:
     audit_script = Path(__file__).resolve().parent.parent.parent / "scripts/audit_label_distribution.py"
     if audit_script.exists():
         print(f"\nRunning post-process label audit on {args.output} ...")
-        result = subprocess.run(["python", str(audit_script), args.output])
+        # Use sys.executable so we run the same interpreter that runs cmd_process
+        # (the venv's python). Hardcoded "python" fails on systems where only
+        # python3 is installed, or when running from a venv without symlinks.
+        result = subprocess.run([sys.executable, str(audit_script), args.output])
         if result.returncode != 0:
             print(f"\n⚠️  AUDIT FAILED — dataset has missing or zero-coverage labels.")
             print(f"   Inspect {args.output} before training. Bug class: issue #3.")
