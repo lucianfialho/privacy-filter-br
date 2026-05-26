@@ -22,6 +22,7 @@ SYNTHETIC_F1 = {
     "private_person": 0.9955,
     "private_cpf": 0.9964,
     "private_date": 1.0000,
+    "private_address": 0.9962,
 }
 
 
@@ -55,7 +56,7 @@ def main() -> None:
     over_fp = defaultdict(int)
     over_fn = defaultdict(int)
 
-    gold_categories = {"private_cnpj", "private_person", "private_cpf", "private_date"}
+    gold_categories = {"private_cnpj", "private_person", "private_cpf", "private_date", "private_address"}
 
     sample_frag = defaultdict(list)
     sample_miss = defaultdict(list)
