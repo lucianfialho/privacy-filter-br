@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import random
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -102,3 +103,15 @@ def cmd_process(args) -> None:
     fp_train.close()
     fp_holdout.close()
     print(f"Done. {stats}")
+
+    # Auto-audit: catch the v7 instrumentation-bug class (zero-label categories)
+    # BEFORE the dataset is used for training. Non-fatal — dataset is already
+    # written (expensive batch results preserved), but warn loudly so the user
+    # knows to investigate before submitting to GPU.
+    audit_script = Path(__file__).resolve().parent.parent.parent / "scripts/audit_label_distribution.py"
+    if audit_script.exists():
+        print(f"\nRunning post-process label audit on {args.output} ...")
+        result = subprocess.run(["python", str(audit_script), args.output])
+        if result.returncode != 0:
+            print(f"\n⚠️  AUDIT FAILED — dataset has missing or zero-coverage labels.")
+            print(f"   Inspect {args.output} before training. Bug class: issue #3.")

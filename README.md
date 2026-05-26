@@ -116,6 +116,28 @@ checkpoints/v[3|4]-local/
 - **Output head:** 89 labels (1 O + 22 categorias × 4 BIOES)
 - **Decoding:** HF pipeline `aggregation_strategy="simple"` ou `"first"`
 
+## Contribuindo
+
+```bash
+# Setup
+git clone git@github.com:lucianfialho/privacy-filter-br.git
+cd privacy-filter-br
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+# Optional: pre-commit hooks (lembrete soft quando labeler muda)
+pip install pre-commit
+pre-commit install
+```
+
+Pre-flight check obrigatório antes de submeter batch ou treinar com dataset novo:
+
+```bash
+python scripts/audit_label_distribution.py data/dataset_br_<latest>.jsonl
+```
+
+Esse script é também rodado automaticamente no fim de `openai_batch.py process`. Se falhar, NÃO mande pra GPU — investigue a instrumentação (issue #3 explica a classe de bug).
+
 ## Estrutura do repo
 
 ```
