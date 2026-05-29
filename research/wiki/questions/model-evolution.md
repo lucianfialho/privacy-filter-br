@@ -15,15 +15,28 @@ Living document tracking each model iteration: hypothesis, data, training, bench
 
 The single most useful table. seqeval BIOES micro F1, per rewriter style / template type.
 
+### Synthetic cross-style (in-distribution holdouts)
+
 | Model | Haiku struct | gpt5nano struct | gpt5nano narrative | Spread | Status |
 | --- | --- | --- | --- | --- | --- |
 | v3 | 0.9901 | 0.9947 | 0.9506 | 0.0441 | superseded |
 | v4 | **0.5534** ⚠️ | 0.9992 | 0.8928 | 0.4459 💥 | research artifact only |
 | v5 | 0.9912 | 0.9992 | 0.9564 | 0.0429 | superseded |
-| **v6** | **0.9909** | **0.9993** | **0.9991** | **0.0084** | production (in-distribution) |
-| v7 | TBD | TBD | TBD | TBD | training; targets real-world Phase 1 |
+| v6 | 0.9909 | 0.9993 | 0.9991 | 0.0084 | superseded |
+| v7 | — | — | — | — | superseded (date 0/30 in CVM) |
+| v8 | — | — | — | — | superseded (date 0/30 in CVM) |
+| **v8.1** | — | — | — | — | **production** (date fixed) |
 
-**Synth-to-real gap (Phase 1 — CVM B2B, 30 real docs, overlap scoring):** v6 macro F1 ≈ 0.53. Same model that scores 0.997 on synthetic. The synthetic-to-real gap is the gap that matters; the cross-style matrix is the prerequisite, not the destination.
+### Phase 1 CVM real (30 docs, overlap F1, with boundary merger)
+
+| Model | cpf | cnpj | person | date | macro4 |
+| --- | --- | --- | --- | --- | --- |
+| v3 | 1.0000 | 1.0000 | 0.7143 | 0.0000 | 0.6786 |
+| v7 | 1.0000 | 1.0000 | 0.7143 | 0.0000 | 0.6786 |
+| v8 | 1.0000 | 1.0000 | 0.7317 | 0.0000 | 0.7106 |
+| **v8.1** | **1.0000** | **1.0000** | **0.7143** | **0.7500** 🎯 | **0.8536** |
+
+v8.1 closes the date gap that survived v6→v7→v8. The fix was templates that mirror real BR public documents (CVM FRE, Receita CNPJ, JUCESP, DOU, SINTEGRA, B3) — forces the model to see `"nascido em DATE, exerce profissão"` during training, not just the default gpt-5-nano phrasing `"nascido(a) em DATE, filho(a) de"`.
 
 ## v3 — production baseline (pre-research)
 
@@ -208,13 +221,76 @@ Three targeted fixes, each addressing one diagnosed cause:
 
 Added to TEMPLATES list in `scripts/openai_batch.py` (now 31 total).
 
-**Batch:** 15000 examples via gpt-5-nano. **14902 valid (99.35%), 98 invalid.** Combined with v6: **140297 train + 14011 holdout, 22 cats, 1.2M spans.**
+**Batch:** 15000 examples via gpt-5-nano. **14902 valid (99.35%).** Combined with v6: **140297 train + 14011 holdout.**
 
-**Training:** RTX 2070 SUPER, ~5h ETA. In flight as of writing.
+**Training:** 5h51min RTX 2070 SUPER. **Synth F1:** 0.9968 micro.
 
-**Expected outcome:** Phase 1 macro F1 from 0.53 → ~0.85+ once boundary merger is active AND v7 covers the two distribution gaps.
+**Phase 1 CVM result:** cpf 1.00 / cnpj 1.00 / person 0.71 / **date 0.00** / macro 0.68 (overlap).
 
-If hypotheses validate: publish v7, lib → 0.1.5, re-run Phase 1.
+Boundary merger transformed exact F1 from 0.00 to ~0.90 — confirmed the universal fragmentation hypothesis. CAPS variants helped person detection. **But date stayed at zero.** Lib bumped to 0.1.5, model published as v7 tag but not promoted to main (waiting on date fix).
+
+## v8 — instrumentation fix (data_nasc registered)
+
+**Root cause for v7 date failure:** `data_nasc` and `endereco` were rendered into Jinja templates via `chosen` dict but never registered in `inserted` dict that the labeler uses. Result: across all 140k training examples, **zero** `private_date` labels existed for the prose contexts. Model couldn't learn what it never saw labeled.
+
+**Fix:** in `src/batch/instrumentation.py` (post-refactor of openai_batch.py — issue #4):
+
+```python
+# Date variants
+inserted[data_nasc] = "PRIVATE_DATE"
+inserted[data_nasc.replace("/", "-")] = "PRIVATE_DATE"
+inserted[data_nasc.replace("/", ".")] = "PRIVATE_DATE"
+
+# Full street address + partial
+inserted[endereco] = "PRIVATE_ADDRESS"
+parts = endereco.split(",")
+if len(parts) >= 2:
+    inserted[",".join(parts[:2]).strip()] = "PRIVATE_ADDRESS"
+
+# Name variants — also added Title Case + lowercase + accent-stripped
+nome_ascii = _strip_accents(nome)
+for variant in {nome, nome.upper(), nome.title(), nome.lower(),
+                nome_ascii, nome_ascii.upper(), nome_ascii.title(), nome_ascii.lower()}:
+    inserted[variant] = "PRIVATE_PERSON"
+```
+
+**Dataset:** v7 + 30k new gpt-5-nano + 5k extras = 172009 train / 17070 holdout. **Audit confirmed:** `private_date` jumped from 0 to 35804 labels (20.8% docs); `private_address` from CEP-only to full street + partial.
+
+**Training:** 7h11min. **Synth F1:** 0.9898 micro, date F1 0.95 synth.
+
+**Phase 1 CVM:** cpf 1.00 / cnpj 1.00 / person 0.73 / **date 0.00** ❌ / macro 0.71. Date still failed.
+
+**Diagnosis:** model learned date IN gpt-5-nano's specific phrasing (`"dia X foi"`, `"nascido(a) em X, filho(a)"`) but CVM writes `"nascido em X, exerce profissão"`. Different connector around the date token → model goes from 99% confident to 2% confident. Same class of bug as v4 but specific to one category.
+
+## v8.1 — public-doc templates fix date context overfit
+
+**Hypothesis:** the date overfit is not a labeling problem (v8 fixed that) but a phrasing-context problem. Force the rewriter to preserve real BR phrasings by giving it templates that mirror real documents.
+
+**Seven new templates** added in `templates/`:
+
+- `cvm_fre_administrador` — CVM FRE board-member format
+- `rfb_cnpj_cadastro` — Receita Federal CNPJ lookup
+- `jucesp_ato_societario` — JUCESP partnership alteration
+- `dou_publicacao_oficial` — DOU edital format
+- `sintegra_consulta` — SINTEGRA contributor lookup
+- `b3_fato_relevante` — B3 material fact disclosure
+- `timeline_evento` — date-rich timeline with 10+ phrasings (`nascido em`, `nato em`, `vigência X a Y`, `desde Z`, `aniversário`, `em DD/MM/YYYY`)
+
+**Dataset:** v7 + 30k new gpt-5-nano (with new templates) + 5k extras = 172075 train / 17072 holdout. Audit: `private_date` 37.7% docs, `private_address` 81.4%.
+
+**Training:** 6h57min, seed=42 pinned. **Synth F1:** 0.9906 micro, per-category: date F1 0.9616 (precision 0.96, recall 0.96), address F1 0.9375.
+
+**Phase 1 CVM (overlap, with merger):**
+
+| | cpf | cnpj | person | **date** | macro4 |
+| --- | --- | --- | --- | --- | --- |
+| v8.1 | 1.0000 | 1.0000 | 0.7143 | **0.7500** 🎯 | **0.8536** |
+
+Was 0.0000 in v7 and v8. **TP 24, FP 10, FN 6 on 30 documents.** Exact F1 with merger: 0.3125 (TP 10 boundary-perfect, FP 24 boundary-off). Model now detects dates in real CVM; some boundaries need polish but the existence-detection problem is solved.
+
+**Published v8.1 to HF canonical** (main + tag `v8.1`). Lib bumped 0.1.5 → 0.1.6.
+
+**Lesson reinforced:** template diversity matters more than dataset size for closing context-overfit gaps. The new templates added ~10% to the dataset but moved date F1 from 0 to 0.75 in real-world. Same class of fix as v6 narrative templates (which fixed CUST/revenue gaps) — context shape is what the model overfits on, and the cheapest way to teach robustness is to give the rewriter a more constrained template that copies real-world phrasing patterns it'll have to preserve.
 
 ## Cumulative lessons (across all versions)
 
@@ -238,7 +314,10 @@ If hypotheses validate: publish v7, lib → 0.1.5, re-run Phase 1.
 | 2026-05-24 | v5 (Haiku ∪ gpt5nano) → 0.9912 / 0.9992 generalizes both; published |
 | 2026-05-25 | v6 (+ 10 narrative templates) → spread 0.0084; published |
 | 2026-05-25 | Phase 1 (CVM 30 real docs) → v6 macro F1 0.53; 3 root causes diagnosed |
-| 2026-05-25 | v7 (3 fixes: boundary merger + CAPS + date prose) → training in flight |
+| 2026-05-25 | v7 (boundary merger + CAPS + date prose) → macro 0.68 CVM, date still 0/30 |
+| 2026-05-26 | v8 (data_nasc instrumentation fix) → macro 0.71 CVM, date still 0/30 — diagnosed as gpt5nano phrasing overfit |
+| 2026-05-27 | v8.1 (7 templates derived from CVM/RFB/JUCESP/DOU/SINTEGRA/B3) → **macro 0.85 CVM, date 0.75 overlap** ✓ |
+| 2026-05-28 | v8.1 published to HF canonical (main + tag v8.1); lib bump 0.1.5 → 0.1.6 |
 
 ## Related
 

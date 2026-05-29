@@ -8,25 +8,30 @@ Repositório completo: modelo + lib de produção + research wiki + scripts de a
 
 | Componente | Onde | Estado |
 | --- | --- | --- |
-| **Modelo NER** | [`lucianfialho/privacy-filter-br`](https://huggingface.co/lucianfialho/privacy-filter-br) | publicado (latest = v7) |
+| **Modelo NER** | [`lucianfialho/privacy-filter-br`](https://huggingface.co/lucianfialho/privacy-filter-br) | publicado (latest = v8.1) |
 | **Demo Gradio** | [`spaces/privacy-filter-br-demo`](https://huggingface.co/spaces/lucianfialho/privacy-filter-br-demo) | live |
-| **Lib `br-pii-guardrail`** | [`br-pii-guardrail/`](./br-pii-guardrail) | 0.1.5 (regex+checksum+NER+boundary merger+AES vault) |
+| **Lib `br-pii-guardrail`** | [`br-pii-guardrail/`](./br-pii-guardrail) | 0.1.6 (regex+checksum+NER+boundary merger+AES vault) |
 | **Research wiki** | [`research/`](./research) | 9 papers + living `model-evolution.md` |
 
-Repo canônico HF tem tags `v3` (legacy baseline) e `v7` (current) acessíveis via `revision=`. Versões v4, v5, v6 não estão expostas — iterações intermediárias com problemas conhecidos, documentadas em [`research/wiki/questions/model-evolution.md`](./research/wiki/questions/model-evolution.md).
+Repo canônico HF tem tags `v3` (legacy baseline) e `v8.1` (current) acessíveis via `revision=`. Versões v4, v5, v6, v7, v8 não estão expostas — iterações intermediárias com problemas conhecidos, documentadas em [`research/wiki/questions/model-evolution.md`](./research/wiki/questions/model-evolution.md).
 
 ## Performance
 
-**Métrica:** seqeval BIOES micro F1 em sintético, overlap-tolerant em real.
+**Métrica:** seqeval BIOES micro F1 em sintético, overlap-tolerant em real (30 docs CVM).
 
-| Modelo | Haiku struct | gpt5nano struct | gpt5nano narrative | Phase 1 CVM real (3 cats) |
-| --- | --- | --- | --- | --- |
-| v3 | 0.9901 | 0.9947 | 0.9506 | 0.71 |
-| **v7 (+ boundary merger)** | **0.9956** | **0.9993** | **0.9991** | **0.90** |
+| Modelo | Sintético (micro) | Phase 1 CVM real (overlap F1) |
+| --- | --- | --- |
+|  |  | cpf / cnpj / person / **date** / macro4 |
+| v3 | 0.9900 | 1.00 / 1.00 / 0.71 / 0.00 / 0.68 |
+| v7 (+ merger) | 0.9968 | 1.00 / 1.00 / 0.71 / 0.00 / 0.68 |
+| v8 (+ merger) | 0.9898 | 1.00 / 1.00 / 0.73 / 0.00 / 0.71 |
+| **v8.1 (+ merger)** | **0.9906** | **1.00 / 1.00 / 0.71 / 0.75 / 0.85** 🎯 |
 
-v7 = v3 → v4 → v5 → v6 + boundary merger + CAPS templates + dates-in-prose templates. Spread cross-style 0.0084 (53× menor que v4 catastrófico, 5× menor que v5). Phase 1 CVM real F1 sobe de 0.53 (v6 baseline) → 0.90 (v7 com merger) nas 3 cats endereçáveis (cpf/cnpj/person). História completa: [`research/wiki/questions/model-evolution.md`](./research/wiki/questions/model-evolution.md).
+v8.1 fecha o gap em date — antes 0/30, agora 24/30 com overlap (precision 0.71, recall 0.80). A fix foi adicionar 7 templates que copiam estrutura de docs públicos brasileiros (CVM FRE, RFB CNPJ, JUCESP, DOU, SINTEGRA, B3, timeline). O modelo aprende `"nascido em DATE, exerce profissão"` durante o treino e não trava só no `"nascido(a) em DATE, filho(a) de"` que o rewriter gpt-5-nano produz por default.
 
-**Limitação aberta:** `private_date` ainda falha em 100% dos casos reais por bug de instrumentação no labeler — fix planejado para v8. Ver issues [#1](https://github.com/lucianfialho/privacy-filter-br/issues/1) (dataset expansion) e [#2](https://github.com/lucianfialho/privacy-filter-br/issues/2) (schema v8).
+História completa: [`research/wiki/questions/model-evolution.md`](./research/wiki/questions/model-evolution.md).
+
+**Limitação aberta restante:** `private_address` ainda não é mensurável em Phase 1 v1 (CVM não tem endereços de rua nos docs de cadastro). Phase 1 v2 ([issue #1](https://github.com/lucianfialho/privacy-filter-br/issues/1)) traz fontes com address gold real. Schema expansion pra identificadores transacionais BR (CMC7, linha digitável, NF-e key, PIX EVP) tracked em [issue #2](https://github.com/lucianfialho/privacy-filter-br/issues/2).
 
 ## ⚠️ Caveat de honestidade
 
