@@ -84,7 +84,7 @@ For prose / free text where regex misses (descriptions, comments, etc):
 from br_pii_guardrail.ner import NER
 
 ner = NER(model_path="lucianfialho/privacy-filter-br")  # HF Hub canonical (latest = v7)
-# Pin a version: NER(model_path="lucianfialho/privacy-filter-br", revision="v7")
+# Pin a version: NER(model_path="lucianfialho/privacy-filter-br", revision="v8.1")
 guard = Guardrail.default(ner=ner)
 guard.use_ner_fallback = True  # only run NER when regex finds nothing
 
